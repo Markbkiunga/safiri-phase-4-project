@@ -1,13 +1,14 @@
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
-from sqlalchemy.orm import validates
-
-
+from sqlalchemy.orm import validates, relationship
+from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.ext.associationproxy import association_proxy
+from sqlalchemy_serializer import SerializerMixin
 
 db = SQLAlchemy()
 
-class User(db.Model):
+class User(db.Model, SerializerMixin):
     __tablename__ = 'users'
     
     id = db.Column(db.Integer, primary_key=True)
@@ -16,7 +17,9 @@ class User(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, onupdate=datetime.utcnow)
 
-    activities = db.relationship('Activity', secondary='user_activities', back_populates='users')
+    activities = db.relationship('UserActivity', back_populates='user')
+    activity_names = association_proxy('activities', 'activity_name')  
+
     reviews = db.relationship('Review', back_populates='user')
     profile = db.relationship('Profile', uselist=False, back_populates='user', cascade='all, delete-orphan')
 
@@ -32,16 +35,19 @@ class User(db.Model):
     def check_password(self, password):
         return check_password_hash(self.password, password)
     
+    serialize_rules = ('-password',) 
+    
     def serialize(self):
         return {
             'id': self.id,
             'username': self.username,
-            'created_at': self.created_at.strftime('%Y-%m-%d %H:%M:%S'),
-            'profile': self.profile.serialize() if self.profile else None
+            'created_at': self.created_at.strftime('%m/%d/%Y'),  
+            'profile': self.profile.serialize() if self.profile else None,
+            'activities': self.activity_names 
         }
 
 
-class Profile(db.Model):
+class Profile(db.Model, SerializerMixin):
     __tablename__ = 'profiles'
     
     id = db.Column(db.Integer, primary_key=True)
@@ -54,7 +60,6 @@ class Profile(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
     user = db.relationship('User', back_populates='profile')
-
 
     @validates('email')
     def validate_email(self, key, value):
@@ -74,8 +79,7 @@ class Profile(db.Model):
         }
 
 
-
-class UserActivity(db.Model):
+class UserActivity(db.Model, SerializerMixin):
     __tablename__ = 'user_activities'
     
     id = db.Column(db.Integer, primary_key=True)
@@ -89,7 +93,13 @@ class UserActivity(db.Model):
     user = db.relationship('User', back_populates='activities')
     activity = db.relationship('Activity', back_populates='participants')
 
-class Review(db.Model):
+    # This one will be used in association_proxy
+    @property
+    def activity_name(self):
+        return self.activity.name if self.activity else None  
+
+
+class Review(db.Model, SerializerMixin):
     __tablename__ = 'reviews'
     
     id = db.Column(db.Integer, primary_key=True)
@@ -114,14 +124,12 @@ class Review(db.Model):
             'id': self.id,
             'description': self.description,
             'rating': self.rating,
-            'created_at': self.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+            'created_at': self.created_at.strftime('%m/%d/%Y'),
             'user_id': self.user_id
         }
 
 
-
-
-class Activity(db.Model):
+class Activity(db.Model, SerializerMixin):
     __tablename__ = 'activities'
     
     id = db.Column(db.Integer, primary_key=True)
@@ -131,10 +139,8 @@ class Activity(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, onupdate=datetime.utcnow)
     
-    users = db.relationship('User', secondary='user_activities', back_populates='activities')
     participants = db.relationship('UserActivity', back_populates='activity')
     site_activities = db.relationship('SiteActivity', back_populates='activity', cascade='all, delete-orphan')
-
 
     def serialize(self):
         return {
@@ -142,11 +148,10 @@ class Activity(db.Model):
             'name': self.name,
             'description': self.description,
             'category': self.category,
-            'created_at': self.created_at.strftime('%Y-%m-%d %H:%M:%S')
+            'created_at': self.created_at.strftime('%m/%d/%Y'), 
+            # Included the  participant usernames
+            'participants': [user_activity.user.username for user_activity in self.participants]  
         }
-
-
-
 
 
 class SiteActivity(db.Model):
@@ -162,11 +167,7 @@ class SiteActivity(db.Model):
     site = db.relationship('Site', back_populates='site_activities')
 
 
-    
-
-
-
-class Site(db.Model):
+class Site(db.Model, SerializerMixin):
     __tablename__ = 'sites'
     
     id = db.Column(db.Integer, primary_key=True)
@@ -192,10 +193,7 @@ class Site(db.Model):
         }
 
 
-
-
-
-class Location(db.Model):
+class Location(db.Model, SerializerMixin):
     __tablename__ = 'locations'
     
     id = db.Column(db.Integer, primary_key=True)
@@ -213,5 +211,3 @@ class Location(db.Model):
             'name': self.name,
             'description': self.description
         }
-
-
