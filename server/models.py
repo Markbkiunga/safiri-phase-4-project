@@ -110,3 +110,18 @@ class Site(db.Model):
     activities = db.relationship('Activity', back_populates='site')
     reviews = db.relationship('Review', back_populates='site')
     location = db.relationship('Location', back_populates='sites')
+
+
+
+
+class Location(db.Model):
+    __tablename__ = 'locations'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    image = db.Column(db.String(255))
+    description = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, onupdate=datetime.utcnow)
+
+    sites = db.relationship('Site', back_populates='location')
