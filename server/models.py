@@ -63,3 +63,19 @@ class Review(db.Model):
 
     user = db.relationship('User', back_populates='reviews')
     site = db.relationship('Site', back_populates='reviews')
+
+
+
+class Activity(db.Model):
+    __tablename__ = 'activities'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    description = db.Column(db.Text)
+    name = db.Column(db.String(100), nullable=False)
+    category = db.Column(db.String(50))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, onupdate=datetime.utcnow)
+    
+    users = db.relationship('User', secondary='user_activities', back_populates='activities')
+    participants = db.relationship('UserActivity', back_populates='activity')
+    site = db.relationship('Site', back_populates='activities')
