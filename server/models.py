@@ -1,7 +1,7 @@
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_serialize import FlaskSerializeMixin
+from sqlalchemy.orm import validates
 
 
 
@@ -32,7 +32,7 @@ class User(db.Model):
     def check_password(self, password):
         return check_password_hash(self.password, password)
     
-def serialize(self):
+    def serialize(self):
         return {
             'id': self.id,
             'username': self.username,
