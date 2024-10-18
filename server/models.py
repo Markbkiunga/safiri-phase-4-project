@@ -1,6 +1,9 @@
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_serialize import FlaskSerializeMixin
+
+
 
 db = SQLAlchemy()
 
@@ -17,11 +20,26 @@ class User(db.Model):
     reviews = db.relationship('Review', back_populates='user')
     profile = db.relationship('Profile', uselist=False, back_populates='user', cascade='all, delete-orphan')
 
+    @validates('username')
+    def validate_username(self, key, value):
+        if len(value) < 5:
+            raise ValueError('Username must be at least 5 characters long')
+        return value
+
     def set_password(self, password):
         self.password = generate_password_hash(password)
     
     def check_password(self, password):
         return check_password_hash(self.password, password)
+    
+def serialize(self):
+        return {
+            'id': self.id,
+            'username': self.username,
+            'created_at': self.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+            'profile': self.profile.serialize() if self.profile else None
+        }
+
 
 class Profile(db.Model):
     __tablename__ = 'profiles'
@@ -36,6 +54,26 @@ class Profile(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
     user = db.relationship('User', back_populates='profile')
+
+
+    @validates('email')
+    def validate_email(self, key, value):
+        if '@' not in value:
+            raise ValueError('Invalid email format')
+        return value
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'first_name': self.first_name,
+            'last_name': self.last_name,
+            'email': self.email,
+            'image': self.image,
+            'bio': self.bio,
+            'phone_number': self.phone_number
+        }
+
+
 
 class UserActivity(db.Model):
     __tablename__ = 'user_activities'
@@ -65,6 +103,22 @@ class Review(db.Model):
     user = db.relationship('User', back_populates='reviews')
     site = db.relationship('Site', back_populates='reviews')
 
+    @validates('rating')
+    def validate_rating(self, key, value):
+        if not (1 <= value <= 5):
+            raise ValueError('Rating must be between 1 and 5')
+        return value
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'description': self.description,
+            'rating': self.rating,
+            'created_at': self.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+            'user_id': self.user_id
+        }
+
+
 
 
 class Activity(db.Model):
@@ -82,6 +136,18 @@ class Activity(db.Model):
     site_activities = db.relationship('SiteActivity', back_populates='activity', cascade='all, delete-orphan')
 
 
+    def serialize(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'description': self.description,
+            'category': self.category,
+            'created_at': self.created_at.strftime('%Y-%m-%d %H:%M:%S')
+        }
+
+
+
+
 
 class SiteActivity(db.Model):
     __tablename__ = 'site_activities'
@@ -94,6 +160,9 @@ class SiteActivity(db.Model):
 
     activity = db.relationship('Activity', back_populates='site_activities')
     site = db.relationship('Site', back_populates='site_activities')
+
+
+    
 
 
 
@@ -112,6 +181,17 @@ class Site(db.Model):
     reviews = db.relationship('Review', back_populates='site')
     location = db.relationship('Location', back_populates='sites')
 
+    def serialize(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'description': self.description,
+            'category': self.category,
+            'is_saved': self.is_saved,
+            'activities': [activity.serialize() for activity in self.activities]
+        }
+
+
 
 
 
@@ -126,3 +206,12 @@ class Location(db.Model):
     updated_at = db.Column(db.DateTime, onupdate=datetime.utcnow)
 
     sites = db.relationship('Site', back_populates='location', cascade='all, delete-orphan')
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'description': self.description
+        }
+
+
