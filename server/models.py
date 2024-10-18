@@ -92,8 +92,8 @@ class SiteActivity(db.Model):
     activity_id = db.Column(db.Integer, db.ForeignKey('activities.id'), nullable=False)
     site_id = db.Column(db.Integer, db.ForeignKey('sites.id'), nullable=False)
 
-    activity = db.relationship('Activity', backref='site_activities')
-    site = db.relationship('Site', backref='site_activities')
+    activity = db.relationship('Activity', back_populates='site_activities')
+    site = db.relationship('Site', back_populates='site_activities')
 
 
 
@@ -108,7 +108,7 @@ class Site(db.Model):
     category = db.Column(db.String(50))
     location_id = db.Column(db.Integer, db.ForeignKey('locations.id'), nullable=False)
     
-    activities = db.relationship('Activity', back_populates='site')
+    activities = db.relationship('Activity', secondary='site_activities', back_populates='site')
     reviews = db.relationship('Review', back_populates='site')
     location = db.relationship('Location', back_populates='sites')
 
