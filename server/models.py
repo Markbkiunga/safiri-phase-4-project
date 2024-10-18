@@ -13,6 +13,9 @@ class User(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, onupdate=datetime.utcnow)
 
+    activities = db.relationship('Activity', secondary='user_activities', back_populates='users')
+    reviews = db.relationship('Review', back_populates='user')
+
     def set_password(self, password):
         self.password = generate_password_hash(password)
     
