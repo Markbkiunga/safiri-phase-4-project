@@ -15,6 +15,7 @@ class User(db.Model):
 
     activities = db.relationship('Activity', secondary='user_activities', back_populates='users')
     reviews = db.relationship('Review', back_populates='user')
+    profile = db.relationship('Profile', uselist=False, back_populates='user', cascade='all, delete-orphan')
 
     def set_password(self, password):
         self.password = generate_password_hash(password)
@@ -78,7 +79,7 @@ class Activity(db.Model):
     
     users = db.relationship('User', secondary='user_activities', back_populates='activities')
     participants = db.relationship('UserActivity', back_populates='activity')
-    site = db.relationship('Site', back_populates='activities')
+    site_activities = db.relationship('SiteActivity', back_populates='activity', cascade='all, delete-orphan')
 
 
 
@@ -124,4 +125,4 @@ class Location(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, onupdate=datetime.utcnow)
 
-    sites = db.relationship('Site', back_populates='location')
+    sites = db.relationship('Site', back_populates='location', cascade='all, delete-orphan')
