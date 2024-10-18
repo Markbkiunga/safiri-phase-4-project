@@ -93,3 +93,20 @@ class SiteActivity(db.Model):
 
     activity = db.relationship('Activity', backref='site_activities')
     site = db.relationship('Site', backref='site_activities')
+
+
+
+class Site(db.Model):
+    __tablename__ = 'sites'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    image = db.Column(db.String(255))
+    description = db.Column(db.Text)
+    is_saved = db.Column(db.Boolean, default=False)
+    category = db.Column(db.String(50))
+    location_id = db.Column(db.Integer, db.ForeignKey('locations.id'), nullable=False)
+    
+    activities = db.relationship('Activity', back_populates='site')
+    reviews = db.relationship('Review', back_populates='site')
+    location = db.relationship('Location', back_populates='sites')
