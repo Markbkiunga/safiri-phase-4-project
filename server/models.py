@@ -79,3 +79,17 @@ class Activity(db.Model):
     users = db.relationship('User', secondary='user_activities', back_populates='activities')
     participants = db.relationship('UserActivity', back_populates='activity')
     site = db.relationship('Site', back_populates='activities')
+
+
+
+class SiteActivity(db.Model):
+    __tablename__ = 'site_activities'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, onupdate=datetime.utcnow)
+    activity_id = db.Column(db.Integer, db.ForeignKey('activities.id'), nullable=False)
+    site_id = db.Column(db.Integer, db.ForeignKey('sites.id'), nullable=False)
+
+    activity = db.relationship('Activity', backref='site_activities')
+    site = db.relationship('Site', backref='site_activities')
