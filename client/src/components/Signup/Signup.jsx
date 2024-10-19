@@ -23,7 +23,6 @@ function Signup() {
     }).then((r) => {
       if (r.ok) {
         r.json().then((user) => {
-          console.log(user);
           alert('Sign Up successful');
           navigate('/login');
         });

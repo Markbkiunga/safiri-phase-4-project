@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import './NavBar.css';
 import logo from '../pictures/logo.png';
 
-const NavBar = ({ onLogout, user }) => {
+const NavBar = ({ setUser, user }) => {
   const navigate = useNavigate();
   useEffect(() => {
     let lastScrollTop = 0;
@@ -24,7 +24,7 @@ const NavBar = ({ onLogout, user }) => {
   function handleLogout() {
     fetch('/logout', {
       method: 'DELETE',
-    }).then(() => onLogout());
+    }).then(() => setUser(null));
   }
   return (
     <nav className="navbar">
