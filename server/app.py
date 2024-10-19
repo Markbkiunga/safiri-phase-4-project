@@ -52,8 +52,28 @@ class Logout(Resource):
             return {"error": "You are not logged in"}, 401
 
 
+class Signup(Resource):
+    def post(self):
+        data = request.get_json() if request.is_json else request.form
+        if "username" not in data or "password" not in data:
+            return {"error": "Missing required fields"}, 422
+        try:
+            user = User(
+                username=data["username"],
+            )
+            user.set_password(data["password"])
+            db.session.add(user)
+            db.session.commit()
+            session["user_id"] = user.id
+            return user.to_dict(), 201
+        except Exception as e:
+            print(e)
+            return {"error": f"str({e})"}, 500
+
+
 api.add_resource(Login, "/login", endpoint="login")
 api.add_resource(CheckSession, "/check_session", endpoint="check_session")
 api.add_resource(Logout, "/logout", endpoint="logout")
+api.add_resource(Signup, "/signup", endpoint="signup")
 if __name__ == "__main__":
     app.run(port=5555, debug=True)
