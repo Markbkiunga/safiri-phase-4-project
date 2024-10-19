@@ -68,7 +68,7 @@ class Signup(Resource):
             return user.to_dict(), 201
         except Exception as e:
             print(e)
-            return {"error": f"str({e})"}, 500
+            return {"error": f"{str(e)}"}, 500
 
 
 api.add_resource(Login, "/login", endpoint="login")
