@@ -323,6 +323,77 @@ class ActivityDetail(Resource):
         except Exception as e:
             db.session.rollback()
             return jsonify({"error": str(e)}), 500
+        
+# UserActivity Resource
+class UserActivityList(Resource):
+    def get(self):
+        user_activities = UserActivity.query.all()
+        return jsonify([user_activity.to_dict() for user_activity in user_activities])
+
+    def post(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('user_id', required=True, help="User ID is required")
+        parser.add_argument('activity_id', required=True, help="Activity ID is required")
+        parser.add_argument('feedback', type=str)
+        parser.add_argument('participation_date', type=str, default=str(datetime.now(gmt_plus_3)))
+        data = parser.parse_args()
+
+        new_user_activity = UserActivity(
+            user_id=data['user_id'],
+            activity_id=data['activity_id'],
+            feedback=data.get('feedback', ''),
+            participation_date=datetime.now(gmt_plus_3),
+            created_at=datetime.now(gmt_plus_3),
+            updated_at=datetime.now(gmt_plus_3)
+        )
+
+        try:
+            db.session.add(new_user_activity)
+            db.session.commit()
+            return jsonify(new_user_activity.to_dict()), 201
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({"error": str(e)}), 500
+
+class UserActivityDetail(Resource):
+    def get(self, id):
+        user_activity = UserActivity.query.get(id)
+        if not user_activity:
+            return jsonify({"error": "User Activity not found"}), 404
+        return jsonify(user_activity.to_dict())
+
+    def put(self, id):
+        user_activity = UserActivity.query.get(id)
+        if not user_activity:
+            return jsonify({"error": "User Activity not found"}), 404
+
+        parser = reqparse.RequestParser()
+        parser.add_argument('feedback', type=str)
+        data = parser.parse_args()
+
+        user_activity.feedback = data.get('feedback', user_activity.feedback)
+        user_activity.updated_at = datetime.now(gmt_plus_3)
+
+        try:
+            db.session.commit()
+            return jsonify(user_activity.to_dict()), 200
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({"error": str(e)}), 500
+
+    def delete(self, id):
+        user_activity = UserActivity.query.get(id)
+        if not user_activity:
+            return jsonify({"error": "User Activity not found"}), 404
+
+        try:
+            db.session.delete(user_activity)
+            db.session.commit()
+            return jsonify({"message": "User Activity deleted successfully"}), 200
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({"error": str(e)}), 500
+
 
 
 api.add_resource(Index, '/')
@@ -333,6 +404,10 @@ api.add_resource(ReviewList, '/reviews')
 api.add_resource(ReviewDetail, '/reviews/<int:id>')
 api.add_resource(ProfileDetail, '/profiles/<int:user_id>')
 api.add_resource(ActivityList, '/activities')
+api.add_resource(ActivityDetail, '/activities/<int:id>')
+api.add_resource(UserActivityList, '/user_activities')
+api.add_resource(UserActivityDetail, '/user_activities/<int:id>')
+
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
