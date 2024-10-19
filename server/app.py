@@ -25,6 +25,7 @@ user_blueprint = Blueprint('user', __name__)
 review_bp = Blueprint('review', __name__)
 activity_bp = Blueprint('activity', __name__)
 site_bp = Blueprint('site', __name__)
+location_bp = Blueprint('location', __name__)
 
 @app.route('/')
 def index():
@@ -355,13 +356,80 @@ def delete_site(site_id):
     except Exception as e:
         db.session.rollback()
         return make_response(jsonify({"error": str(e)}), 500)
+    
+# Route to fetch all locations
+@location_bp.route('/', methods=['GET'])
+def get_all_locations():
+    locations = Location.query.all()
+    return make_response(jsonify([location.to_dict() for location in locations]), 200)
 
+# Route to fetch a specific location by its ID
+@location_bp.route('/<int:location_id>', methods=['GET'])
+def get_location(location_id):
+    location = Location.query.get(location_id)
+    if not location:
+        return make_response(jsonify({"error": "Location not found"}), 404)
+    return make_response(jsonify(location.to_dict()), 200)
+
+# Route to create a new location
+@location_bp.route('/', methods=['POST'])
+def create_location():
+    data = request.get_json()
+    try:
+        new_location = Location(
+            name=data['name'],
+            description=data.get('description', ''),
+            image=data.get('image', '')
+        )
+        db.session.add(new_location)
+        db.session.commit()
+        return make_response(jsonify(new_location.to_dict()), 201)
+    except IntegrityError as e:
+        db.session.rollback()
+        return make_response(jsonify({"error": str(e)}), 400)
+    except KeyError as e:
+        return make_response(jsonify({"error": f"Missing field: {str(e)}"}), 400)
+
+# Route to update a location
+@location_bp.route('/<int:location_id>', methods=['PUT'])
+def update_location(location_id):
+    location = Location.query.get(location_id)
+    if not location:
+        return make_response(jsonify({"error": "Location not found"}), 404)
+
+    data = request.get_json()
+    try:
+        location.name = data.get('name', location.name)
+        location.description = data.get('description', location.description)
+        location.image = data.get('image', location.image)
+
+        db.session.commit()
+        return make_response(jsonify(location.to_dict()), 200)
+    except IntegrityError as e:
+        db.session.rollback()
+        return make_response(jsonify({"error": str(e)}), 400)
+
+# Route to delete a location
+@location_bp.route('/<int:location_id>', methods=['DELETE'])
+def delete_location(location_id):
+    location = Location.query.get(location_id)
+    if not location:
+        return make_response(jsonify({"error": "Location not found"}), 404)
+
+    try:
+        db.session.delete(location)
+        db.session.commit()
+        return make_response(jsonify({"message": "Location deleted successfully"}), 200)
+    except Exception as e:
+        db.session.rollback()
+        return make_response(jsonify({"error": str(e)}), 500)
 
 
 app.register_blueprint(user_blueprint, url_prefix='/users')
 app.register_blueprint(review_bp, url_prefix='/reviews')
 app.register_blueprint(activity_bp, url_prefix='/activities')
 app.register_blueprint(site_bp, url_prefix='/sites')
+app.register_blueprint(location_bp, url_prefix='/locations')
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
