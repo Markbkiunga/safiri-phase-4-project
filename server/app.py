@@ -32,7 +32,8 @@ class Login(Resource):
             return user.to_dict(), 200
         else:
             return {"error": "Invalid username or password"}, 401
-        
+
+
 class CheckSession(Resource):
     def get(self):
         if session["user_id"]:
@@ -41,7 +42,18 @@ class CheckSession(Resource):
         else:
             return {"error": "You are not logged in"}, 401
 
+
+class Logout(Resource):
+    def delete(self):
+        if session["user_id"]:
+            session["user_id"] = None
+            return {}, 204
+        else:
+            return {"error": "You are not logged in"}, 401
+
+
 api.add_resource(Login, "/login", endpoint="login")
 api.add_resource(CheckSession, "/check_session", endpoint="check_session")
+api.add_resource(Logout, "/logout", endpoint="logout")
 if __name__ == "__main__":
     app.run(port=5555, debug=True)
