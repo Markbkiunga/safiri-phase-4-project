@@ -26,6 +26,7 @@ review_bp = Blueprint('review', __name__)
 activity_bp = Blueprint('activity', __name__)
 site_bp = Blueprint('site', __name__)
 location_bp = Blueprint('location', __name__)
+user_activity_bp = Blueprint('user_activity', __name__)
 
 @app.route('/')
 def index():
@@ -423,6 +424,84 @@ def delete_location(location_id):
     except Exception as e:
         db.session.rollback()
         return make_response(jsonify({"error": str(e)}), 500)
+    
+# Route to fetch all user activities
+@user_activity_bp.route('/', methods=['GET'])
+def get_all_user_activities():
+    user_activities = UserActivity.query.all()
+    return make_response(jsonify([activity.to_dict() for activity in user_activities]), 200)
+
+# Route to fetch a specific user activity by its ID
+@user_activity_bp.route('/<int:activity_id>', methods=['GET'])
+def get_user_activity(activity_id):
+    user_activity = UserActivity.query.get(activity_id)
+    if not user_activity:
+        return make_response(jsonify({"error": "User activity not found"}), 404)
+    return make_response(jsonify(user_activity.to_dict()), 200)
+
+# Route to create a new user activity
+@user_activity_bp.route('/', methods=['POST'])
+def create_user_activity():
+    data = request.get_json()
+    try:
+        # Validate user and activity existence
+        user = User.query.get(data.get('user_id'))
+        activity = Activity.query.get(data.get('activity_id'))
+
+        if not user or not activity:
+            return jsonify({"error": "User or Activity not found"}), 404
+
+        new_user_activity = UserActivity(
+            feedback=data.get('feedback', ''),
+            participation_date=data['participation_date'],  # Make sure to pass the date in the correct format
+            user=user,
+            activity=activity
+        )
+        db.session.add(new_user_activity)
+        db.session.commit()
+
+        return make_response(jsonify(new_user_activity.to_dict()), 201)
+    
+    except IntegrityError as e:
+        db.session.rollback()
+        return make_response(jsonify({"error": str(e)}), 400)
+    except KeyError as e:
+        return make_response(jsonify({"error": f"Missing field: {str(e)}"}), 400)
+
+# Route to update a user activity
+@user_activity_bp.route('/<int:activity_id>', methods=['PUT'])
+def update_user_activity(activity_id):
+    user_activity = UserActivity.query.get(activity_id)
+    if not user_activity:
+        return make_response(jsonify({"error": "User activity not found"}), 404)
+
+    data = request.get_json()
+    try:
+        user_activity.feedback = data.get('feedback', user_activity.feedback)
+        user_activity.participation_date = data.get('participation_date', user_activity.participation_date)
+
+        db.session.commit()
+        return make_response(jsonify(user_activity.to_dict()), 200)
+
+    except IntegrityError as e:
+        db.session.rollback()
+        return make_response(jsonify({"error": str(e)}), 400)
+
+# Route to delete a user activity
+@user_activity_bp.route('/<int:activity_id>', methods=['DELETE'])
+def delete_user_activity(activity_id):
+    user_activity = UserActivity.query.get(activity_id)
+    if not user_activity:
+        return make_response(jsonify({"error": "User activity not found"}), 404)
+
+    try:
+        db.session.delete(user_activity)
+        db.session.commit()
+        return make_response(jsonify({"message": "User activity deleted successfully"}), 200)
+
+    except Exception as e:
+        db.session.rollback()
+        return make_response(jsonify({"error": str(e)}), 500)
 
 
 app.register_blueprint(user_blueprint, url_prefix='/users')
@@ -430,6 +509,8 @@ app.register_blueprint(review_bp, url_prefix='/reviews')
 app.register_blueprint(activity_bp, url_prefix='/activities')
 app.register_blueprint(site_bp, url_prefix='/sites')
 app.register_blueprint(location_bp, url_prefix='/locations')
+app.register_blueprint(user_activity_bp, url_prefix='/user_activities')
+
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
