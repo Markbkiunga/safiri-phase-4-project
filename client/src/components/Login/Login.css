@@ -15,3 +15,8 @@
   position: relative;
   width: 5%;
 }
+#error-message {
+  color: red;
+  z-index: 999;
+  background-color: red;
+}

@@ -4,6 +4,7 @@ import './Login.css';
 function Login({ onLogin }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState(null);
 
   function handleSubmit(e) {
     e.preventDefault();
@@ -16,11 +17,15 @@ function Login({ onLogin }) {
         username: username,
         password: password,
       }),
-    })
-      .then((r) => r.json())
-      .then((user) => onLogin(user));
+    }).then((r) => {
+      if (r.ok) {
+        r.json().then((user) => onLogin(user));
+      } else {
+        r.json().then((err) => setError(err.error));
+        console.log(error);
+      }
+    });
   }
-
   return (
     <div id="login-form-container">
       <form onSubmit={handleSubmit} id="login-form">
@@ -29,18 +34,19 @@ function Login({ onLogin }) {
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           className="login-input"
-          placeholder='Enter username'
+          placeholder="Enter username"
         />
         <input
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           className="login-input"
-          placeholder='Enter password'
+          placeholder="Enter password"
         />
         <button type="submit" id="login-button">
           Log in
         </button>
+        {error && <p style={{ color: 'red', fontSize: 'small' }}>{error}</p>}
       </form>
     </div>
   );
