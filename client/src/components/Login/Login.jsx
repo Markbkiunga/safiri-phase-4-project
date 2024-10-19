@@ -2,12 +2,13 @@
 import { useState } from 'react';
 import './Login.css';
 import { useNavigate } from 'react-router-dom';
+import logo from '../pictures/SAFIRI LOGO.png';
+
 function Login({ onLogin }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
   const navigate = useNavigate();
-  console.log(onLogin);
   function handleSubmit(e) {
     e.preventDefault();
     fetch('/login', {
@@ -30,6 +31,8 @@ function Login({ onLogin }) {
   return (
     <div id="login-form-container">
       <form onSubmit={handleSubmit} id="login-form">
+        <img src={logo} alt="safiri-logo" id="safiri-logo" />
+        <h1>Log in Page</h1>
         <input
           type="text"
           value={username}
@@ -54,6 +57,13 @@ function Login({ onLogin }) {
           id="signup-button"
         >
           Sign up
+        </button>
+        <button
+          onClick={() => {
+            navigate('/');
+          }}
+        >
+          X
         </button>
         {error && <p style={{ color: 'red', fontSize: 'small' }}>{error}</p>}
       </form>

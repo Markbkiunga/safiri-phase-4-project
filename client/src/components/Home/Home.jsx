@@ -17,7 +17,7 @@ const Home = () => {
   if (user) {
     return (
       <div className="home">
-        <NavBar onLogout={setUser} />
+        <NavBar onLogout={setUser} user={user} />
         <h2 className="home-header">
           Welcome, {user.username} to Safiri where all your travel wishes can
           come true!
@@ -27,7 +27,14 @@ const Home = () => {
     );
   } else {
     return (
-        <Login onLogin={setUser}/>
+      <div className="home">
+        <NavBar user={user} onLogout={setUser} />
+        <h2 className="home-header">
+          Welcome to Safiri where all your travel wishes can come true!
+        </h2>
+        <Slideshow />
+        <Login onLogin={setUser} />
+      </div>
     );
   }
 };

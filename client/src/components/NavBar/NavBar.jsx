@@ -1,9 +1,10 @@
 import { useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './NavBar.css';
 import logo from '../pictures/logo.png';
 
-const NavBar = ({ onLogout }) => {
+const NavBar = ({ onLogout, user }) => {
+  const navigate = useNavigate();
   useEffect(() => {
     let lastScrollTop = 0;
     const navbar = document.querySelector('.navbar');
@@ -45,9 +46,22 @@ const NavBar = ({ onLogout }) => {
           <Link to="/ContactUs">ContactUs</Link>
         </li>
       </ul>
-      <button onClick={handleLogout} id="logout-button">
-        Logout
-      </button>
+
+      {user && (
+        <button onClick={handleLogout} id="logout-button">
+          Logout
+        </button>
+      )}
+      {!user && (
+        <button
+          onClick={() => {
+            navigate('/login');
+          }}
+          id="login-button"
+        >
+          Login
+        </button>
+      )}
     </nav>
   );
 };

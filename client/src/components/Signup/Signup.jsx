@@ -2,6 +2,8 @@
 import { useState } from 'react';
 import './Signup.css';
 import { useNavigate } from 'react-router-dom';
+import logo from '../pictures/SAFIRI LOGO.png';
+
 function Signup() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -33,6 +35,8 @@ function Signup() {
   return (
     <div id="signup-form-container">
       <form onSubmit={handleSubmit} id="signup-form">
+        <img src={logo} alt="safiri-logo" id="safiri-logo" />
+        <h1>Sign up Page</h1>
         <input
           type="text"
           value={username}
@@ -57,6 +61,13 @@ function Signup() {
           id="login-button"
         >
           Log in
+        </button>
+        <button
+          onClick={() => {
+            navigate('/');
+          }}
+        >
+          X
         </button>
         {error && <p style={{ color: 'red', fontSize: 'small' }}>{error}</p>}
       </form>
