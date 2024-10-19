@@ -127,12 +127,91 @@ class UserDetail(Resource):
         except Exception as e:
             db.session.rollback()
             return make_response(jsonify({"error": str(e)}), 500)
+        
+
+class ReviewList(Resource):
+    def get(self):
+        reviews = Review.query.all()
+        return jsonify([review.to_dict() for review in reviews])
+
+    def post(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('description', required=True, help="Description is required")
+        parser.add_argument('rating', type=int, required=True, help="Rating is required")
+        parser.add_argument('user_id', type=int, required=True)
+        parser.add_argument('site_id', type=int, required=True)
+        data = parser.parse_args()
+
+        user = User.query.get(data['user_id'])
+        site = Site.query.get(data['site_id'])
+
+        if not user or not site:
+            return jsonify({"error": "User or Site not found"}), 404
+
+        new_review = Review(
+            description=data['description'],
+            rating=data['rating'],
+            user_id=user.id,
+            site_id=site.id,
+            created_at=datetime.now(gmt_plus_3),
+            updated_at=datetime.now(gmt_plus_3)
+        )
+
+        try:
+            db.session.add(new_review)
+            db.session.commit()
+            return jsonify(new_review.to_dict()), 201
+        except IntegrityError as e:
+            db.session.rollback()
+            return jsonify({"error": str(e)}), 400
+
+class ReviewDetail(Resource):
+    def get(self, id):
+        review = Review.query.get(id)
+        if not review:
+            return jsonify({"error": "Review not found"}), 404
+        return jsonify(review.to_dict())
+
+    def put(self, id):
+        review = Review.query.get(id)
+        if not review:
+            return jsonify({"error": "Review not found"}), 404
+
+        parser = reqparse.RequestParser()
+        parser.add_argument('description', type=str)
+        parser.add_argument('rating', type=int)
+        data = parser.parse_args()
+
+        review.description = data.get('description', review.description)
+        review.rating = data.get('rating', review.rating)
+        review.updated_at = datetime.now(gmt_plus_3)
+
+        try:
+            db.session.commit()
+            return jsonify(review.to_dict())
+        except IntegrityError as e:
+            db.session.rollback()
+            return jsonify({"error": str(e)}), 400
+
+    def delete(self, id):
+        review = Review.query.get(id)
+        if not review:
+            return jsonify({"error": "Review not found"}), 404
+
+        try:
+            db.session.delete(review)
+            db.session.commit()
+            return jsonify({"message": "Review deleted successfully"})
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({"error": str(e)}), 500
 
 api.add_resource(Index, '/')
 api.add_resource(UserRegistration, '/users/register')
 api.add_resource(UserLogin, '/users/login')
 api.add_resource(UserDetail, '/users/<int:user_id>')
-
+api.add_resource(ReviewList, '/reviews')
+api.add_resource(ReviewDetail, '/reviews/<int:id>')
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
