@@ -393,7 +393,102 @@ class UserActivityDetail(Resource):
         except Exception as e:
             db.session.rollback()
             return jsonify({"error": str(e)}), 500
+        
+# Site Resource
+class SiteList(Resource):
+    def get(self):
+        sites = Site.query.all()
+        return jsonify([site.to_dict() for site in sites])
 
+    def post(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('name', required=True, help="Name is required")
+        parser.add_argument('description', type=str)
+        parser.add_argument('category', type=str)
+        parser.add_argument('location_id', type=int, required=True)
+        data = parser.parse_args()
+
+        new_site = Site(
+            name=data['name'],
+            description=data.get('description', ''),
+            category=data.get('category', ''),
+            location_id=data['location_id']
+        )
+
+        try:
+            db.session.add(new_site)
+            db.session.commit()
+            return jsonify(new_site.to_dict()), 201
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({"error": str(e)}), 500
+
+class SiteDetail(Resource):
+    def get(self, id):
+        site = Site.query.get(id)
+        if not site:
+            return jsonify({"error": "Site not found"}), 404
+        return jsonify(site.to_dict())
+
+    def put(self, id):
+        site = Site.query.get(id)
+        if not site:
+            return jsonify({"error": "Site not found"}), 404
+
+        parser = reqparse.RequestParser()
+        parser.add_argument('name', type=str)
+        parser.add_argument('description', type=str)
+        parser.add_argument('category', type=str)
+        data = parser.parse_args()
+
+        site.name = data.get('name', site.name)
+        site.description = data.get('description', site.description)
+        site.category = data.get('category', site.category)
+
+        try:
+            db.session.commit()
+            return jsonify(site.to_dict()), 200
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({"error": str(e)}), 500
+
+    def delete(self, id):
+        site = Site.query.get(id)
+        if not site:
+            return jsonify({"error": "Site not found"}), 404
+
+        try:
+            db.session.delete(site)
+            db.session.commit()
+            return jsonify({"message": "Site deleted successfully"}), 200
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({"error": str(e)}), 500
+
+# Location Resource
+class LocationList(Resource):
+    def get(self):
+        locations = Location.query.all()
+        return jsonify([location.to_dict() for location in locations])
+
+    def post(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('name', required=True, help="Name is required")
+        parser.add_argument('description', type=str)
+        data = parser.parse_args()
+
+        new_location = Location(
+            name=data['name'],
+            description=data.get('description', '')
+        )
+
+        try:
+            db.session.add(new_location)
+            db.session.commit()
+            return jsonify(new_location.to_dict()), 201
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({"error": str(e)}), 500
 
 
 api.add_resource(Index, '/')
@@ -407,6 +502,9 @@ api.add_resource(ActivityList, '/activities')
 api.add_resource(ActivityDetail, '/activities/<int:id>')
 api.add_resource(UserActivityList, '/user_activities')
 api.add_resource(UserActivityDetail, '/user_activities/<int:id>')
+api.add_resource(SiteList, '/sites')
+api.add_resource(SiteDetail, '/sites/<int:id>')
+api.add_resource(LocationList, '/locations')
 
 
 if __name__ == '__main__':
