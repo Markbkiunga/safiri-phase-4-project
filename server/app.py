@@ -251,6 +251,78 @@ class ProfileDetail(Resource):
         except Exception as e:
             db.session.rollback()
             return make_response(jsonify({"error": str(e)}), 500)
+        
+# Activity Resource
+class ActivityList(Resource):
+    def get(self):
+        activities = Activity.query.all()
+        return jsonify([activity.to_dict() for activity in activities])
+
+    def post(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('name', required=True, help="Name is required")
+        parser.add_argument('description', type=str)
+        parser.add_argument('category', type=str)
+        data = parser.parse_args()
+
+        new_activity = Activity(
+            name=data['name'],
+            description=data.get('description', ''),
+            category=data.get('category', ''),
+            created_at=datetime.now(gmt_plus_3),
+            updated_at=datetime.now(gmt_plus_3)
+        )
+
+        try:
+            db.session.add(new_activity)
+            db.session.commit()
+            return jsonify(new_activity.to_dict()), 201
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({"error": str(e)}), 500
+
+class ActivityDetail(Resource):
+    def get(self, id):
+        activity = Activity.query.get(id)
+        if not activity:
+            return jsonify({"error": "Activity not found"}), 404
+        return jsonify(activity.to_dict())
+
+    def put(self, id):
+        activity = Activity.query.get(id)
+        if not activity:
+            return jsonify({"error": "Activity not found"}), 404
+
+        parser = reqparse.RequestParser()
+        parser.add_argument('name', type=str)
+        parser.add_argument('description', type=str)
+        parser.add_argument('category', type=str)
+        data = parser.parse_args()
+
+        activity.name = data.get('name', activity.name)
+        activity.description = data.get('description', activity.description)
+        activity.category = data.get('category', activity.category)
+        activity.updated_at = datetime.now(gmt_plus_3)
+
+        try:
+            db.session.commit()
+            return jsonify(activity.to_dict()), 200
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({"error": str(e)}), 500
+
+    def delete(self, id):
+        activity = Activity.query.get(id)
+        if not activity:
+            return jsonify({"error": "Activity not found"}), 404
+
+        try:
+            db.session.delete(activity)
+            db.session.commit()
+            return jsonify({"message": "Activity deleted successfully"}), 200
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({"error": str(e)}), 500
 
 
 api.add_resource(Index, '/')
@@ -260,6 +332,7 @@ api.add_resource(UserDetail, '/users/<int:user_id>')
 api.add_resource(ReviewList, '/reviews')
 api.add_resource(ReviewDetail, '/reviews/<int:id>')
 api.add_resource(ProfileDetail, '/profiles/<int:user_id>')
+api.add_resource(ActivityList, '/activities')
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
