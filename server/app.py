@@ -4,7 +4,7 @@
 
 # Remote library imports
 from flask import request, Blueprint, make_response, jsonify
-from flask_restful import Resource
+from flask_restful import Resource, Api, reqparse
 
 # Local imports
 from config import app, db, api
@@ -20,12 +20,17 @@ from sqlalchemy.exc import IntegrityError
 
 gmt_plus_3 = pytz.timezone("Africa/Nairobi")
 
+#initializing Flask-Restful Api
 
 
+#defining resource classes
 
-@app.route('/')
-def index():
-    return '<h1>Project Server</h1>'
+class index(Resource):
+    def get(self):
+        return make_response(jsonify({"message": "Welcome to Safiri API"}), 200)
+    
+
+
 
 
 
