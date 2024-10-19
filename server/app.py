@@ -9,7 +9,7 @@ from flask_restful import Resource
 # Local imports
 from config import app, db, api
 # Add your model imports
-from models import User, Profile, UserActivity, Review, SiteActivity, Site, Location
+from models import User, Profile, UserActivity, Review, SiteActivity, Site, Location, Activity
 
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -23,6 +23,7 @@ gmt_plus_3 = pytz.timezone("Africa/Nairobi")
 
 user_blueprint = Blueprint('user', __name__)
 review_bp = Blueprint('review', __name__)
+activity_bp = Blueprint('activity', __name__)
 
 @app.route('/')
 def index():
@@ -214,10 +215,78 @@ def delete_review(id):
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
+    
+# Route to fetch all activities
+@activity_bp.route('/', methods=['GET'])
+def get_all_activities():
+    activities = Activity.query.all()
+    return make_response(jsonify([activity.to_dict() for activity in activities]), 200)
+
+# Route to fetch a specific activity by its ID
+@activity_bp.route('/<int:activity_id>', methods=['GET'])
+def get_activity(activity_id):
+    activity = Activity.query.get(activity_id)
+    if not activity:
+        return make_response(jsonify({"error": "Activity not found"}), 404)
+    return make_response(jsonify(activity.to_dict()), 200)
+
+# Route to create a new activity
+@activity_bp.route('/', methods=['POST'])
+def create_activity():
+    data = request.get_json()
+    try:
+        new_activity = Activity(
+            name=data['name'],
+            description=data.get('description', ''),
+            category=data.get('category', '')
+        )
+        db.session.add(new_activity)
+        db.session.commit()
+        return make_response(jsonify(new_activity.to_dict()), 201)
+    except IntegrityError as e:
+        db.session.rollback()
+        return make_response(jsonify({"error": str(e)}), 400)
+    except KeyError as e:
+        return make_response(jsonify({"error": f"Missing field: {str(e)}"}), 400)
+
+# Route to update an activity
+@activity_bp.route('/<int:activity_id>', methods=['PUT'])
+def update_activity(activity_id):
+    activity = Activity.query.get(activity_id)
+    if not activity:
+        return make_response(jsonify({"error": "Activity not found"}), 404)
+
+    data = request.get_json()
+    try:
+        activity.name = data.get('name', activity.name)
+        activity.description = data.get('description', activity.description)
+        activity.category = data.get('category', activity.category)
+
+        db.session.commit()
+        return make_response(jsonify(activity.to_dict()), 200)
+    except IntegrityError as e:
+        db.session.rollback()
+        return make_response(jsonify({"error": str(e)}), 400)
+
+# Route to delete an activity
+@activity_bp.route('/<int:activity_id>', methods=['DELETE'])
+def delete_activity(activity_id):
+    activity = Activity.query.get(activity_id)
+    if not activity:
+        return make_response(jsonify({"error": "Activity not found"}), 404)
+
+    try:
+        db.session.delete(activity)
+        db.session.commit()
+        return make_response(jsonify({"message": "Activity deleted successfully"}), 200)
+    except Exception as e:
+        db.session.rollback()
+        return make_response(jsonify({"error": str(e)}), 500)
 
 
 app.register_blueprint(user_blueprint, url_prefix='/users')
 app.register_blueprint(review_bp, url_prefix='/reviews')
+app.register_blueprint(activity_bp, url_prefix='/activities')
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
