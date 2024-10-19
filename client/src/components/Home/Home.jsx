@@ -3,7 +3,6 @@ import React from 'react';
 import NavBar from '../NavBar/NavBar';
 import Slideshow from './Slideshow';
 import Login from '../Login/Login';
-
 const Home = () => {
   const [user, setUser] = useState(null);
 
@@ -27,7 +26,9 @@ const Home = () => {
       </div>
     );
   } else {
-    return <Login onLogin={setUser} />;
+    return (
+        <Login onLogin={setUser}/>
+    );
   }
 };
 

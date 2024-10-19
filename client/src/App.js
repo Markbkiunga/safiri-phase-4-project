@@ -8,6 +8,8 @@ import Discover from './components/Discover/Discover';
 import AboutUs from './components/AboutUs/AboutUs';
 import Review from './components/Review/Review';
 import ContactUs from './components/ContactUs/ContactUs'
+import Signup from './components/Signup/Signup';
+import Login from './components/Login/Login';
 
 
 
@@ -20,8 +22,8 @@ function App() {
         <Route path="/about" element={<AboutUs />} />
         <Route path="/review" element={<Review/>} />
         <Route path="/ContactUs" element={<ContactUs/>}/>
-
-
+        <Route path="/signup" element={<Signup/>}/>
+        <Route path="/login" element={<Login />}/>
       </Routes>
     </Router>
   );
