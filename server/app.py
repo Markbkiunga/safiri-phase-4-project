@@ -24,6 +24,7 @@ gmt_plus_3 = pytz.timezone("Africa/Nairobi")
 user_blueprint = Blueprint('user', __name__)
 review_bp = Blueprint('review', __name__)
 activity_bp = Blueprint('activity', __name__)
+site_bp = Blueprint('site', __name__)
 
 @app.route('/')
 def index():
@@ -282,11 +283,85 @@ def delete_activity(activity_id):
     except Exception as e:
         db.session.rollback()
         return make_response(jsonify({"error": str(e)}), 500)
+    
+# Route to fetch all sites
+@site_bp.route('/', methods=['GET'])
+def get_all_sites():
+    sites = Site.query.all()
+    return make_response(jsonify([site.to_dict() for site in sites]), 200)
+
+# Route to fetch a specific site by its ID
+@site_bp.route('/<int:site_id>', methods=['GET'])
+def get_site(site_id):
+    site = Site.query.get(site_id)
+    if not site:
+        return make_response(jsonify({"error": "Site not found"}), 404)
+    return make_response(jsonify(site.to_dict()), 200)
+
+# Route to create a new site
+@site_bp.route('/', methods=['POST'])
+def create_site():
+    data = request.get_json()
+    try:
+        new_site = Site(
+            name=data['name'],
+            description=data.get('description', ''),
+            image=data.get('image', ''),
+            category=data.get('category', ''),
+            location_id=data['location_id']  
+        )
+        db.session.add(new_site)
+        db.session.commit()
+        return make_response(jsonify(new_site.to_dict()), 201)
+    except IntegrityError as e:
+        db.session.rollback()
+        return make_response(jsonify({"error": str(e)}), 400)
+    except KeyError as e:
+        return make_response(jsonify({"error": f"Missing field: {str(e)}"}), 400)
+
+# Route to update a site
+@site_bp.route('/<int:site_id>', methods=['PUT'])
+def update_site(site_id):
+    site = Site.query.get(site_id)
+    if not site:
+        return make_response(jsonify({"error": "Site not found"}), 404)
+
+    data = request.get_json()
+    try:
+        site.name = data.get('name', site.name)
+        site.description = data.get('description', site.description)
+        site.image = data.get('image', site.image)
+        site.category = data.get('category', site.category)
+        site.is_saved = data.get('is_saved', site.is_saved)
+        site.location_id = data.get('location_id', site.location_id)
+
+        db.session.commit()
+        return make_response(jsonify(site.to_dict()), 200)
+    except IntegrityError as e:
+        db.session.rollback()
+        return make_response(jsonify({"error": str(e)}), 400)
+
+# Route to delete a site
+@site_bp.route('/<int:site_id>', methods=['DELETE'])
+def delete_site(site_id):
+    site = Site.query.get(site_id)
+    if not site:
+        return make_response(jsonify({"error": "Site not found"}), 404)
+
+    try:
+        db.session.delete(site)
+        db.session.commit()
+        return make_response(jsonify({"message": "Site deleted successfully"}), 200)
+    except Exception as e:
+        db.session.rollback()
+        return make_response(jsonify({"error": str(e)}), 500)
+
 
 
 app.register_blueprint(user_blueprint, url_prefix='/users')
 app.register_blueprint(review_bp, url_prefix='/reviews')
 app.register_blueprint(activity_bp, url_prefix='/activities')
+app.register_blueprint(site_bp, url_prefix='/sites')
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
