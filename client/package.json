@@ -2,7 +2,7 @@
   "name": "phase2project",
   "version": "0.1.0",
   "private": true,
-  "proxy":"https://safiri-backend.vercel.app",
+  "proxy":"http://127.0.0.1:5555",
   "dependencies": {
     "@react-icons/all-files": "^4.1.0",
     "@testing-library/jest-dom": "^5.17.0",
