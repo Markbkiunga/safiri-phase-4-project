@@ -65,6 +65,9 @@ if __name__ == '__main__':
             profiles.append(profile)
             db.session.add(user)
             db.session.add(profile)
+        test_user = User(username= 'markbkiunga')
+        test_user.set_password('markbkiungapassword')
+        db.session.add(test_user)
 
         db.session.commit()
 
