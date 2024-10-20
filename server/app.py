@@ -28,7 +28,7 @@ gmt_plus_3 = pytz.timezone("Africa/Nairobi")
 # Simple index page to verify server is running
 class Index(Resource):
     def get(self):
-        return '<h1>Project Server Running</h1>'
+        return '<h1>Project Server</h1>'
 
 # User registration class
 class UserRegistration(Resource):
