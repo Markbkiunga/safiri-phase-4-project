@@ -82,6 +82,12 @@ class Signup(Resource):
         except Exception as e:
             print(e)
             return {"error": f"{str(e)}"}, 500
+        
+class UserList(Resource):
+    def get(self):
+        users = User.query.all()
+        return jsonify([user.to_dict() for user in users])
+
 class UserDetail(Resource):
     def get(self, user_id):
         user = User.query.get(user_id)
@@ -89,7 +95,7 @@ class UserDetail(Resource):
             return make_response(jsonify({"error": "User not found"}), 404)
         return make_response(jsonify(user.to_dict()), 200)
 
-    def put(self, user_id):
+    def patch(self, user_id):
         user = User.query.get(user_id)
         if not user:
             return make_response(jsonify({"error": "User not found"}), 404)
@@ -169,7 +175,7 @@ class ReviewDetail(Resource):
             return jsonify({"error": "Review not found"}), 404
         return jsonify(review.to_dict())
 
-    def put(self, id):
+    def patch(self, id):
         review = Review.query.get(id)
         if not review:
             return jsonify({"error": "Review not found"}), 404
@@ -204,7 +210,7 @@ class ProfileDetail(Resource):
             return make_response(jsonify({"error": "Profile not found"}), 404)
         return make_response(jsonify(profile.to_dict()), 200)
 
-    def put(self, user_id):
+    def patch(self, user_id):
         profile = Profile.query.filter_by(user_id=user_id).first()
         if not profile:
             return make_response(jsonify({"error": "Profile not found"}), 404)
@@ -279,7 +285,7 @@ class ActivityDetail(Resource):
             return jsonify({"error": "Activity not found"}), 404
         return jsonify(activity.to_dict())
 
-    def put(self, id):
+    def patch(self, id):
         activity = Activity.query.get(id)
         if not activity:
             return jsonify({"error": "Activity not found"}), 404
@@ -353,7 +359,7 @@ class UserActivityDetail(Resource):
             return jsonify({"error": "User Activity not found"}), 404
         return jsonify(user_activity.to_dict())
 
-    def put(self, id):
+    def patch(self, id):
         user_activity = UserActivity.query.get(id)
         if not user_activity:
             return jsonify({"error": "User Activity not found"}), 404
@@ -421,7 +427,7 @@ class SiteDetail(Resource):
             return jsonify({"error": "Site not found"}), 404
         return jsonify(site.to_dict())
 
-    def put(self, id):
+    def patch(self, id):
         site = Site.query.get(id)
         if not site:
             return jsonify({"error": "Site not found"}), 404
@@ -456,6 +462,82 @@ class SiteDetail(Resource):
             db.session.rollback()
             return jsonify({"error": str(e)}), 500
 
+def serialize_site_activity(site_activity):
+    return {
+        "id": site_activity.id,
+        "activity_id": site_activity.activity_id,
+        "site_id": site_activity.site_id,
+        "created_at": site_activity.created_at.isoformat() if site_activity.created_at else None,
+        "updated_at": site_activity.updated_at.isoformat() if site_activity.updated_at else None
+    }
+
+class SiteActivityList(Resource):
+    def get(self):
+        site_activities = SiteActivity.query.all()
+        return jsonify([serialize_site_activity(site_activity) for site_activity in site_activities])
+
+    def post(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('activity_id', required=True, help="Activity ID is required")
+        parser.add_argument('site_id', required=True, help="Site ID is required")
+        data = parser.parse_args()
+
+        new_site_activity = SiteActivity(
+            activity_id=data['activity_id'],
+            site_id=data['site_id']
+        )
+
+        try:
+            db.session.add(new_site_activity)
+            db.session.commit()
+            return serialize_site_activity(new_site_activity), 201
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({"error": str(e)}), 500
+
+
+class SiteActivityDetail(Resource):
+    def get(self, id):
+        site_activity = SiteActivity.query.get(id)
+        if not site_activity:
+            return jsonify({"error": "SiteActivity not found"}), 404
+        return jsonify(site_activity.to_dict())
+
+    def patch(self, id):
+        site_activity = SiteActivity.query.get(id)
+        if not site_activity:
+            return jsonify({"error": "SiteActivity not found"}), 404
+
+        parser = reqparse.RequestParser()
+        parser.add_argument('activity_id', type=int)
+        parser.add_argument('site_id', type=int)
+        data = parser.parse_args()
+
+        if data['activity_id'] is not None:
+            site_activity.activity_id = data['activity_id']
+        if data['site_id'] is not None:
+            site_activity.site_id = data['site_id']
+
+        try:
+            db.session.commit()
+            return jsonify(site_activity.to_dict()), 200
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({"error": str(e)}), 500
+
+    def delete(self, id):
+        site_activity = SiteActivity.query.get(id)
+        if not site_activity:
+            return jsonify({"error": "SiteActivity not found"}), 404
+
+        try:
+            db.session.delete(site_activity)
+            db.session.commit()
+            return jsonify({"message": "SiteActivity deleted successfully"}), 200
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({"error": str(e)}), 500
+
 # Location Resource
 class LocationList(Resource):
     def get(self):
@@ -486,9 +568,10 @@ api.add_resource(Login, "/login", endpoint="login")
 api.add_resource(CheckSession, "/check_session", endpoint="check_session")
 api.add_resource(Logout, "/logout", endpoint="logout")
 api.add_resource(Signup, "/signup", endpoint="signup")
+api.add_resource(UserList, '/users', endpoint='users')
 api.add_resource(UserDetail, '/users/<int:user_id>')
-api.add_resource(ReviewList, '/reviews')
-api.add_resource(ReviewDetail, '/reviews/<int:id>')
+api.add_resource(ReviewList, '/reviews', endpoint='reviews')
+api.add_resource(ReviewDetail, '/reviews/<int:id>', endpoint='review_detail')
 api.add_resource(ProfileDetail, '/profiles/<int:user_id>')
 api.add_resource(ActivityList, '/activities')
 api.add_resource(ActivityDetail, '/activities/<int:id>')
@@ -496,6 +579,9 @@ api.add_resource(UserActivityList, '/user_activities')
 api.add_resource(UserActivityDetail, '/user_activities/<int:id>')
 api.add_resource(SiteList, '/sites')
 api.add_resource(SiteDetail, '/sites/<int:id>')
+api.add_resource(SiteActivityList, '/site_activities', endpoint='site_activities')
+api.add_resource(SiteActivityDetail, '/site_activities/<int:id>')
+
 api.add_resource(LocationList, '/locations')
 
 
