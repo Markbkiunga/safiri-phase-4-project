@@ -9,6 +9,7 @@ import * as Yup from 'yup';
 const Review = () => {
   const [reviews, setReviews] = useState([]);
 
+  // Fetch existing reviews from the Flask server
   useEffect(() => {
     const fetchReviews = async () => {
       try {
@@ -17,13 +18,7 @@ const Review = () => {
           throw new Error('Network response was not ok');
         }
         const data = await response.json();
-        if (Array.isArray(data)) {
-          setReviews(data);
-          console.log(data);
-        } else {
-          console.error('Unexpected data structure:', data);
-          setReviews([]);
-        }
+        setReviews(data);
       } catch (error) {
         console.error('Error fetching reviews:', error);
         setReviews([]);
@@ -33,27 +28,40 @@ const Review = () => {
     fetchReviews();
   }, []);
 
+  // Form validation schema using Yup
   const validationSchema = Yup.object().shape({
-    name: Yup.string().required('Required'),
-    place: Yup.string().required('Required'),
-    reviewText: Yup.string().required('Required'),
-    source: Yup.string().required('Required'),
+    name: Yup.string().required('Name is required'),
+    place: Yup.string().required('Place visited is required'),
+    reviewText: Yup.string().required('Review is required'),
+    image: Yup.string().url('Must be a valid URL').optional(),
+    rating: Yup.number()
+      .min(1, 'Rating must be between 1 and 10')
+      .max(10, 'Rating must be between 1 and 10')
+      .required('Rating is required'),
+    source: Yup.string().required('Source is required'),
   });
 
-  const handleSubmit = (values, { resetForm }) => {
-    const newReview = {
-      id: Date.now(),
-      name: values.name,
-      place: values.place,
-      review: values.reviewText,
-      image: values.image,
-      rating: values.rating,
-      source: values.source,
-    };
+  // Handle form submission and send data to the server
+  const handleSubmit = async (values, { resetForm }) => {
+    try {
+      const response = await fetch('/reviews', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(values),
+      });
 
-    console.log(newReview);
-    setReviews([...reviews, newReview]);
-    resetForm();
+      if (!response.ok) {
+        throw new Error('Failed to submit review');
+      }
+
+      const newReview = await response.json();
+      setReviews([...reviews, newReview]);
+      resetForm();
+    } catch (error) {
+      console.error('Error submitting review:', error);
+    }
   };
 
   return (
@@ -71,7 +79,7 @@ const Review = () => {
               place: '',
               reviewText: '',
               image: '',
-              rating: null,
+              rating: '',
               source: '',
             }}
             validationSchema={validationSchema}
@@ -84,15 +92,13 @@ const Review = () => {
                   <Field type="text" id="name" name="name" />
                   <ErrorMessage name="name" component="div" className="error" />
                 </div>
+
                 <div className="form-group">
                   <label htmlFor="place">Place Visited:</label>
                   <Field type="text" id="place" name="place" />
-                  <ErrorMessage
-                    name="place"
-                    component="div"
-                    className="error"
-                  />
+                  <ErrorMessage name="place" component="div" className="error" />
                 </div>
+
                 <div className="form-group">
                   <label htmlFor="reviewText">Review:</label>
                   <Field as="textarea" id="reviewText" name="reviewText" />
@@ -102,6 +108,7 @@ const Review = () => {
                     className="error"
                   />
                 </div>
+
                 <div className="form-group">
                   <label htmlFor="image">Image:</label>
                   <Field
@@ -110,7 +117,9 @@ const Review = () => {
                     name="image"
                     placeholder="Enter image URL (optional)"
                   />
+                  <ErrorMessage name="image" component="div" className="error" />
                 </div>
+
                 <div className="form-group">
                   <label>How was your experience using our website?</label>
                   <div className="rating">
@@ -126,7 +135,9 @@ const Review = () => {
                       </span>
                     ))}
                   </div>
+                  <ErrorMessage name="rating" component="div" className="error" />
                 </div>
+
                 <div className="form-group">
                   <label htmlFor="source">How did you hear about us?</label>
                   <Field as="select" id="source" name="source">
@@ -136,12 +147,9 @@ const Review = () => {
                     <option value="advertisement">From an Advertisement</option>
                     <option value="social-media">From Social Media</option>
                   </Field>
-                  <ErrorMessage
-                    name="source"
-                    component="div"
-                    className="error"
-                  />
+                  <ErrorMessage name="source" component="div" className="error" />
                 </div>
+
                 <button type="submit" id="submit-review-button">
                   Submit Review
                 </button>
@@ -149,35 +157,33 @@ const Review = () => {
             )}
           </Formik>
         </div>
+
         <div className="existing-reviews new-reviews">
           <h2>Reviews from Other Tourists</h2>
           {reviews.length > 0 ? (
             <ul>
               {reviews.map((review) => (
                 <li key={review.id} className="review-item">
-                  {review.user.profile.image && (
+                  {review.image && (
                     <img
-                      src={review.user.profile.image}
-                      alt={`${review.user.username}'s review`}
+                      src={review.image}
+                      alt={`${review.name}'s review`}
                       className="review-picture"
                     />
                   )}
-                  <h3>{review.user.username}</h3>
-                  {review.site.description && (
-                    <p>
-                      <strong>Place Visited:</strong> {review.site.description}
-                    </p>
-                  )}
-                  {review.description && (
-                    <p>
-                      <strong>Review:</strong> {review.description}
-                    </p>
-                  )}
-                  {review.rating && (
-                    <p>
-                      <strong>Rating:</strong> {review.rating}
-                    </p>
-                  )}
+                  <h3>{review.name}</h3>
+                  <p>
+                    <strong>Place Visited:</strong> {review.place}
+                  </p>
+                  <p>
+                    <strong>Review:</strong> {review.reviewText}
+                  </p>
+                  <p>
+                    <strong>Rating:</strong> {review.rating}
+                  </p>
+                  <p>
+                    <strong>Source:</strong> {review.source}
+                  </p>
                 </li>
               ))}
             </ul>
@@ -186,6 +192,7 @@ const Review = () => {
           )}
         </div>
       </div>
+
       <div id="review-page-footer">
         <Footer />
       </div>
