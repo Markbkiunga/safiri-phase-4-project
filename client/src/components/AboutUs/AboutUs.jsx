@@ -8,7 +8,7 @@ import NavBar from '../NavBar/NavBar';
 import meganImage from '../pictures/Meg image.png';
 import Footer from '../Footer/Footer';
 
-function AboutUs({user}) {
+function AboutUs({ user }) {
   return (
     <>
       <NavBar user={user} />
@@ -120,6 +120,11 @@ function TeamSection() {
           name="Kevin Kamau"
           imageUrl={kevinImage}
           githubLink="https://github.com/Kevinichai"
+        />
+        <TeamMember
+          name="Anthony Onyango"
+          imageUrl="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBwgHBgkIBwgKCgkLDRYPDQwMDRsUFRAWIB0iIiAdHx8kKDQsJCYxJx8fLT0tMTU3Ojo6Iys/RD84QzQ5OjcBCgoKDQwNGg8PGjclHyU3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3N//AABEIAJQArwMBIgACEQEDEQH/xAAaAAEAAwEBAQAAAAAAAAAAAAAAAgMEAQUH/8QAKxABAAIBAwIFAwQDAAAAAAAAAAECAxEhMQRBEiIyUXFhgZETFFKxM0Kh/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAH/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwD7iAAAAAAAAAAOax7mse4OgAAAAAAAAAAAAAAAI2vEIXvrtVAEpyTP0RmdeQAAB2JmOJSrkmPqgAuraLcJM/wspftILAAAAAAAAAAFWS2u0cJZLaRoqAAABy1q1jW06fIOiieppHETPw7HU4551gFw5ExMbTq6AACzHbtKxn7rqW8UAkAAAAAACNp0rIKrzraXAAABG94pSbTww3vN7az+F/WTvWvbTVmAAVFmLJOO2vMd4bazFqxaOJec19JbWk1ntKKvAASxzpb5RI2kGgcjeIdAAAAAQyelNDL6QVAAAAydX/kr8KGnq67Rf22lmUABBp6PizM2dJXw45tPeUFwAoAC6k+WEkcfohIAAAABG8eWUnJ3iYBQExoAAA5asWia24liy4rY54ma9pbuI3RnJTibV/IPPGya9Pbnw/adCsYKzrWa/eQU4cM3mJtExX+2zjhH9THPF6/lLngAAAHaxraAXV9MOgAAAAAACrJGk69pQX2jWNFMxpOgOKc+b9Py13t/SeS/gpa3twwazPMgla9rTra0yiCoAAJUyWpOtZ0RAbsWWuSPa0cwsedW00tFo7PQrMWiLRxMIrqzFHefshWPFOy6I0jQHQAAAAAAAEb18UfVIBg63WKxE95ZHrZcNM1dLx8T7MGbpb452jxV94UUACAAAADb0nmxRHtsrw9He++Ty1/6348dcdfDWNIRStYrCQAAAAAAAAAAAGgAqyYMWTe1Y1942UW6Gv8AreY+d2wBg/Y3/nU/Y2/nX8N4DJXoqR6rWn4X48OPH6KxCwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB//Z"
+          githubLink="https://github.com/antoniodemax"
         />
       </div>
     </div>
