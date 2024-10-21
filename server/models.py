@@ -7,6 +7,7 @@ from sqlalchemy.orm import validates
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy_serializer import SerializerMixin
 from config import db
+import re 
 gmt_plus_3 = pytz.timezone("Africa/Nairobi")
 
 class User(db.Model, SerializerMixin):
@@ -34,16 +35,18 @@ class User(db.Model, SerializerMixin):
 
     @validates('username')
     def validate_username(self, key, username):
-        if len(username) < 5:
-            raise ValueError('Username must be at least 5 characters long')
+        if len(username) < 5 or not username.isalnum():
+            raise ValueError('Username must be at least 5 characters long and alphanumeric.')
         return username
 
     def set_password(self, password):
+        if len(password) < 8:
+            raise ValueError('Password must be at least 8 characters long.')
         self.password = generate_password_hash(password)
-    
+
     def check_password(self, password):
         return check_password_hash(self.password, password)
-    
+
     
 
 class Profile(db.Model, SerializerMixin):
@@ -63,11 +66,17 @@ class Profile(db.Model, SerializerMixin):
     user = db.relationship('User', back_populates='profile')
 
     @validates('email')
-    def validate_email(self, key, email):
-        if '@' not in email:
-            raise ValueError('Email should contain @')
-        return email
+    def validate_email(self, key, value):
+        email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+        if not re.match(email_pattern, value):
+            raise ValueError('Invalid email format.')
+        return value
 
+    @validates('first_name', 'last_name')
+    def validate_name(self, key, value):
+        if not value.isalpha() or len(value) < 2:
+            raise ValueError(f'{key} must contain only alphabetic characters and be at least 2 characters long.')
+        return value
 
 class UserActivity(db.Model, SerializerMixin):
     __tablename__ = 'user_activities'
