@@ -563,14 +563,13 @@ class LocationList(Resource):
             db.session.rollback()
             return jsonify({"error": str(e)}), 500
 
+# Class to get and create reviews
 class ReviewList(Resource):
     def get(self):
-        # Get all reviews
         reviews = Review.query.all()
         return jsonify([review.to_dict() for review in reviews])
 
     def post(self):
-        # Parse input data
         parser = reqparse.RequestParser()
         parser.add_argument('description', required=True, help="Description is required")
         parser.add_argument('rating', type=int, required=True, help="Rating is required")
@@ -578,14 +577,12 @@ class ReviewList(Resource):
         parser.add_argument('site_id', type=int, required=True)
         data = parser.parse_args()
 
-        # Check if user and site exist
         user = User.query.get(data['user_id'])
         site = Site.query.get(data['site_id'])
 
         if not user or not site:
             return jsonify({"error": "User or Site not found"}), 404
 
-        # Create a new review
         new_review = Review(
             description=data['description'],
             rating=data['rating'],
@@ -594,12 +591,10 @@ class ReviewList(Resource):
             created_at=datetime.now(gmt_plus_3)
         )
 
-        # Save the review in the database
         db.session.add(new_review)
         db.session.commit()
         return jsonify(new_review.to_dict()), 201
 
-# Class to handle individual review actions
 class ReviewDetail(Resource):
     def get(self, id):
         review = Review.query.get(id)
@@ -612,7 +607,6 @@ class ReviewDetail(Resource):
         if not review:
             return jsonify({"error": "Review not found"}), 404
 
-        # Parse input data to update review
         parser = reqparse.RequestParser()
         parser.add_argument('description', type=str)
         parser.add_argument('rating', type=int)
@@ -634,8 +628,7 @@ class ReviewDetail(Resource):
         db.session.commit()
         return jsonify({"message": "Review deleted successfully"})
 
-api.add_resource(ReviewList, '/reviews', endpoint='reviews')
-api.add_resource(ReviewDetail, '/reviews/<int:id>', endpoint='review_detail')
+
 api.add_resource(Login, "/login", endpoint="login")
 api.add_resource(CheckSession, "/check_session", endpoint="check_session")
 api.add_resource(Logout, "/logout", endpoint="logout")
