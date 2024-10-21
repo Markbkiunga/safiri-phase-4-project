@@ -21,7 +21,7 @@
 }
 
 .form-container {
-  border-right: 2px solid #ccc;
+  /* border-right: 2px solid #ccc; */
   padding-right: 20px;
 }
 
@@ -115,11 +115,11 @@
 
 .review-item img {
   max-width: 100%;
-  max-height: 200px;
-  width: auto;
-  height: auto;
+  max-height: 100px;
+  width: 50px;
+  height: 50px;
   margin-bottom: 15px;
-  border-radius: 5px;
+  border-radius: 50%;
 }
 
 .review-item h3 {
