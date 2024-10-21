@@ -13,10 +13,11 @@ const Review = () => {
   useEffect(() => {
     const fetchReviews = async () => {
       try {
-        const response = await fetch('/reviews'); 
+        const response = await fetch('/reviews');
         if (!response.ok) throw new Error('Failed to fetch reviews');
         const data = await response.json();
         setReviews(data);
+        console.log(data);
       } catch (error) {
         console.error('Error fetching reviews:', error);
       }
@@ -33,7 +34,7 @@ const Review = () => {
     rating: Yup.number()
       .min(1, 'Rating must be at least 1')
       .max(10, 'Rating must not exceed 10')
-      .required('Rating is required'), 
+      .required('Rating is required'),
     source: Yup.string().required('Source is required'),
   });
 
@@ -44,7 +45,7 @@ const Review = () => {
       const response = await fetch('/reviews', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(values), 
+        body: JSON.stringify(values),
       });
 
       if (!response.ok) throw new Error('Failed to submit review');
@@ -55,12 +56,12 @@ const Review = () => {
 
       // Reset the form after successful submission
       resetForm();
-      alert('Review submitted successfully!'); 
+      alert('Review submitted successfully!');
     } catch (error) {
       console.error('Error submitting review:', error);
       alert('There was an error submitting your review. Please try again.');
     } finally {
-      setSubmitting(false); 
+      setSubmitting(false);
     }
   };
 
@@ -100,14 +101,22 @@ const Review = () => {
                 <div className="form-group">
                   <label htmlFor="place">Place Visited:</label>
                   <Field type="text" id="place" name="place" />
-                  <ErrorMessage name="place" component="div" className="error" />
+                  <ErrorMessage
+                    name="place"
+                    component="div"
+                    className="error"
+                  />
                 </div>
 
                 {/* Review Text */}
                 <div className="form-group">
                   <label htmlFor="reviewText">Review:</label>
                   <Field as="textarea" id="reviewText" name="reviewText" />
-                  <ErrorMessage name="reviewText" component="div" className="error" />
+                  <ErrorMessage
+                    name="reviewText"
+                    component="div"
+                    className="error"
+                  />
                 </div>
 
                 {/* Image URL Field */}
@@ -119,7 +128,11 @@ const Review = () => {
                     name="image"
                     placeholder="Enter image URL (optional)"
                   />
-                  <ErrorMessage name="image" component="div" className="error" />
+                  <ErrorMessage
+                    name="image"
+                    component="div"
+                    className="error"
+                  />
                 </div>
 
                 {/* Rating Field */}
@@ -129,14 +142,20 @@ const Review = () => {
                     {Array.from({ length: 10 }, (_, i) => (
                       <span
                         key={i + 1}
-                        className={`circle ${values.rating === i + 1 ? 'selected' : ''}`}
+                        className={`circle ${
+                          values.rating === i + 1 ? 'selected' : ''
+                        }`}
                         onClick={() => setFieldValue('rating', i + 1)}
                       >
                         {i + 1}
                       </span>
                     ))}
                   </div>
-                  <ErrorMessage name="rating" component="div" className="error" />
+                  <ErrorMessage
+                    name="rating"
+                    component="div"
+                    className="error"
+                  />
                 </div>
 
                 {/* Source Dropdown */}
@@ -149,11 +168,19 @@ const Review = () => {
                     <option value="advertisement">From an Advertisement</option>
                     <option value="social-media">From Social Media</option>
                   </Field>
-                  <ErrorMessage name="source" component="div" className="error" />
+                  <ErrorMessage
+                    name="source"
+                    component="div"
+                    className="error"
+                  />
                 </div>
 
                 {/* Submit Button */}
-                <button type="submit" disabled={isSubmitting} id="submit-review-button">
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  id="submit-review-button"
+                >
                   {isSubmitting ? 'Submitting...' : 'Submit Review'}
                 </button>
               </Form>
@@ -168,14 +195,27 @@ const Review = () => {
             <ul>
               {reviews.map((review) => (
                 <li key={review.id} className="review-item">
-                  {review.image && (
-                    <img src={review.image} alt={`${review.name}'s review`} className="review-picture" />
+                  {review.user && (
+                    <div className="review-user">
+                      <img
+                        src={review.user.profile.image}
+                        alt={`${review.user.username}'s review`}
+                      />
+                      <h3>Username: {review.user.username}</h3>
+                      <br />
+                      <h5>Created At: {review.created_at}</h5>
+                      {review.updated_at !== review.created_at ? (
+                        <h5>Updated At: {review.updated_at}</h5>
+                      ) : (
+                        <></>
+                      )}
+                    </div>
                   )}
-                  <h3>{review.name}</h3>
-                  <p><strong>Place Visited:</strong> {review.place}</p>
-                  <p><strong>Review:</strong> {review.reviewText}</p>
-                  <p><strong>Rating:</strong> {review.rating}</p>
-                  <p><strong>Source:</strong> {review.source}</p>
+                  <p>
+                    <strong>Site: </strong> {review.site.name}
+                  </p>
+                  <p>{review.description}</p>
+                  <p>{'☆'.repeat(review.rating)}</p>
                 </li>
               ))}
             </ul>

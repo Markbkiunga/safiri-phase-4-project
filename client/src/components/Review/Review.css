@@ -121,7 +121,12 @@
   margin-bottom: 15px;
   border-radius: 50%;
 }
-
+.review-user{
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  width: 100%;
+}
 .review-item h3 {
   margin: 0 0 10px;
   color: black;
