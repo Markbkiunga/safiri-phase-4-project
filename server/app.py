@@ -147,6 +147,10 @@ class ReviewList(Resource):
         return jsonify([review.to_dict() for review in reviews])
 
     def post(self):
+        if not session["user_id"]:
+            print("User not logged in")
+            return make_response({"error": "User not logged in"}, 401)
+
         # Parse input data
         parser = reqparse.RequestParser()
         parser.add_argument("reviewText", required=True, help="Description is required")

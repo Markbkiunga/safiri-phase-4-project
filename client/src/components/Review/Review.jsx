@@ -28,10 +28,10 @@ function Review({ user }) {
 
   // 2. Define Yup validation schema with required fields and data type validation
   const validationSchema = Yup.object().shape({
+    userId: Yup.number().required('User ID is required'),
     siteId: Yup.number().required('Site ID is required'),
     reviewText: Yup.string().required('Review is required'),
     rating: Yup.number().required('Rating is required'),
-    userId: Yup.number().required('User ID is required'),
   });
 
   // Handle form submission and POST the data to the Flask server
@@ -44,7 +44,9 @@ function Review({ user }) {
         body: JSON.stringify(values),
       });
 
-      if (!response.ok) throw new Error('Failed to submit review');
+      if (!response.ok) {
+        throw new Error('Failed to submit review');
+      }
 
       // If submission is successful, update the reviews state
       const newReview = await response.json();
@@ -55,7 +57,7 @@ function Review({ user }) {
       alert('Review submitted successfully!');
     } catch (error) {
       console.error('Error submitting review:', error);
-      alert('There was an error submitting your review. Please try again.');
+      alert('There was an error submitting your review.');
     } finally {
       setSubmitting(false);
     }
