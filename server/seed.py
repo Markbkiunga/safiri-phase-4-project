@@ -55,7 +55,7 @@ if __name__ == "__main__":
         # SEED USERS AND PROFILES
         users = []
         profiles = []
-        for _ in range(5):
+        for _ in range(30):
             user = User(
                 username=fake.user_name(),
             )
@@ -65,7 +65,7 @@ if __name__ == "__main__":
                 first_name=fake.first_name(),
                 last_name=fake.last_name(),
                 email=fake.email(),
-                image=fake.image_url(),
+                image="https://picsum.photos/100/100",
                 bio=fake.text(),
                 phone_number=fake.phone_number(),
                 user=user,
@@ -86,7 +86,7 @@ if __name__ == "__main__":
         for _ in range(20):
             site = Site(
                 name=fake.company(),
-                image='https://picsum.photos/100/100',
+                image="https://picsum.photos/100/100",
                 description=fake.text(),
                 is_saved=False,
                 category=rc(["Historical", "Adventure", "Leisure"]),
@@ -99,7 +99,7 @@ if __name__ == "__main__":
 
         # SEED ACTIVITIES
         activities = []
-        for _ in range(5):
+        for _ in range(10):
             activity = Activity(
                 description=fake.sentence(),
                 name=rc(["Hiking", "Kayaking", "Museum Tour", "Beach Day", "Safari"]),
@@ -111,7 +111,7 @@ if __name__ == "__main__":
         db.session.commit()
 
         # SEED USER ACTIVITIES
-        for _ in range(5):
+        for _ in range(10):
             user_activity = UserActivity(
                 feedback=fake.text(),
                 participation_date=fake.date_time_this_year(),
@@ -123,14 +123,14 @@ if __name__ == "__main__":
         db.session.commit()
 
         # SEED SITE ACTIVITIES
-        for _ in range(5):
+        for _ in range(10):
             site_activity = SiteActivity(activity=rc(activities), site=rc(sites))
             db.session.add(site_activity)
 
         db.session.commit()
 
         # SEED REVIEWS
-        for _ in range(5):
+        for _ in range(20):
             review = Review(
                 description=fake.text(),
                 rating=randint(1, 10),

@@ -74,7 +74,7 @@
   border-radius: 50%;
 }
 .site-card div {
-  width: 300px;
+  width: 80%;
 }
 details summary {
   cursor: pointer;
@@ -142,23 +142,29 @@ details[open] div {
 }
 @media screen and (max-width: 560px) {
   .place-card {
-    width: 200px;
+    width: 80%;
   }
   .place-image {
     width: 100%;
     height: fit-content;
   }
+  .site-card {
+    flex-direction: column;
+  }
 }
 @media screen and (max-width: 500px) {
   .place-card {
-    width: 200px;
+    width: 80%;
   }
   .place-image {
     width: 100%;
     height: fit-content;
   }
   #discover-container {
-    margin-left: 100px;
+    margin-left: 25px;
+  }
+  .site-card {
+    flex-direction: column;
   }
 }
 
