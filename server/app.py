@@ -149,36 +149,38 @@ class ReviewList(Resource):
     def post(self):
         # Parse input data
         parser = reqparse.RequestParser()
-        parser.add_argument(
-            "description", required=True, help="Description is required"
-        )
+        parser.add_argument("reviewText", required=True, help="Description is required")
         parser.add_argument(
             "rating", type=int, required=True, help="Rating is required"
         )
-        parser.add_argument("user_id", type=int, required=True)
-        parser.add_argument("site_id", type=int, required=True)
+        parser.add_argument("userId", type=int, required=True)
+        parser.add_argument("siteId", type=int, required=True)
         data = parser.parse_args()
 
         # Check if user and site exist
-        user = User.query.get(data["user_id"])
-        site = Site.query.get(data["site_id"])
+        user = User.query.get(data["userId"])
+        site = Site.query.get(data["siteId"])
 
         if not user or not site:
             return jsonify({"error": "User or Site not found"}), 404
 
         # Create a new review
-        new_review = Review(
-            description=data["description"],
-            rating=data["rating"],
-            user_id=user.id,
-            site_id=site.id,
-            created_at=datetime.now(gmt_plus_3),
-        )
+        try:
+            new_review = Review(
+                description=data["reviewText"],
+                rating=data["rating"],
+                user_id=user.id,
+                site_id=site.id,
+                created_at=datetime.now(gmt_plus_3),
+            )
 
-        # Save the review in the database
-        db.session.add(new_review)
-        db.session.commit()
-        return jsonify(new_review.to_dict()), 201
+            # Save the review in the database
+            db.session.add(new_review)
+            db.session.commit()
+            return new_review.to_dict(), 201
+        except Exception as e:
+            print(e)
+            return jsonify({"error": f"{e}"}), 500
 
 
 # Class to handle individual review actions

@@ -49,7 +49,7 @@ const NavBar = ({ setUser, user }) => {
 
       {user && (
         <button onClick={handleLogout} id="logout-button">
-          Logout
+          Logout User {user.id}
         </button>
       )}
       {!user && (

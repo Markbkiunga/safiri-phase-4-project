@@ -4,7 +4,7 @@ import NavBar from '../NavBar/NavBar';
 import logo from '../pictures/SAFIRI LOGO.png';
 import Footer from '../Footer/Footer';
 
-function Discover() {
+function Discover({ user }) {
   // Original Places State
   const [originalPlaces, setOriginalPlaces] = useState([]);
   // Filtered Places State
@@ -129,7 +129,7 @@ function Discover() {
   return (
     <div>
       <>
-        <NavBar />
+        <NavBar user={user} />
       </>
       <div id="discover-container">
         <div id="content-container">

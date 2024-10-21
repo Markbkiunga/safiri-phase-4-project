@@ -6,7 +6,7 @@ import Footer from '../Footer/Footer';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 
-const Review = () => {
+function Review({ user }) {
   const [reviews, setReviews] = useState([]);
 
   // 1. Fetch existing reviews from the Flask server on component mount
@@ -18,24 +18,20 @@ const Review = () => {
         const data = await response.json();
         setReviews(data);
         console.log(data);
+        // console.log(user);
       } catch (error) {
         console.error('Error fetching reviews:', error);
       }
     };
     fetchReviews();
-  }, []);
+  }, [user]);
 
   // 2. Define Yup validation schema with required fields and data type validation
   const validationSchema = Yup.object().shape({
-    name: Yup.string().required('Name is required'),
-    place: Yup.string().required('Place visited is required'),
+    siteId: Yup.number().required('Site ID is required'),
     reviewText: Yup.string().required('Review is required'),
-    image: Yup.string().url('Must be a valid URL'),
-    rating: Yup.number()
-      .min(1, 'Rating must be at least 1')
-      .max(10, 'Rating must not exceed 10')
-      .required('Rating is required'),
-    source: Yup.string().required('Source is required'),
+    rating: Yup.number().required('Rating is required'),
+    userId: Yup.number().required('User ID is required'),
   });
 
   // Handle form submission and POST the data to the Flask server
@@ -67,10 +63,9 @@ const Review = () => {
 
   return (
     <div id="review-page">
-      <NavBar />
+      <NavBar user={user} />
       <img src={logo} alt="safiri-logo" id="safiri-logo" />
       <h1>Review</h1>
-
       <div className="review-container">
         <div className="form-container">
           <h2>Submit Your Review</h2>
@@ -78,31 +73,32 @@ const Review = () => {
           {/*Formik to manage the form */}
           <Formik
             initialValues={{
-              name: '',
-              place: '',
-              reviewText: '',
-              image: '',
+              siteId: '',
+              review: '',
               rating: '',
-              source: '',
             }}
             validationSchema={validationSchema}
             onSubmit={handleSubmit}
           >
             {({ values, setFieldValue, isSubmitting }) => (
               <Form>
-                {/* Name Field */}
+                {/* User-ID Field */}
                 <div className="form-group">
-                  <label htmlFor="name">Name:</label>
-                  <Field type="text" id="name" name="name" />
-                  <ErrorMessage name="name" component="div" className="error" />
+                  <label htmlFor="userId">User ID:</label>
+                  <Field type="text" id="userId" name="userId" />
+                  <ErrorMessage
+                    name="userId"
+                    component="div"
+                    className="error"
+                  />
                 </div>
 
                 {/* Place Field */}
                 <div className="form-group">
-                  <label htmlFor="place">Place Visited:</label>
-                  <Field type="text" id="place" name="place" />
+                  <label htmlFor="siteId">Site ID:</label>
+                  <Field type="text" id="siteId" name="siteId" />
                   <ErrorMessage
-                    name="place"
+                    name="siteId"
                     component="div"
                     className="error"
                   />
@@ -119,25 +115,9 @@ const Review = () => {
                   />
                 </div>
 
-                {/* Image URL Field */}
-                <div className="form-group">
-                  <label htmlFor="image">Image:</label>
-                  <Field
-                    type="text"
-                    id="image"
-                    name="image"
-                    placeholder="Enter image URL (optional)"
-                  />
-                  <ErrorMessage
-                    name="image"
-                    component="div"
-                    className="error"
-                  />
-                </div>
-
                 {/* Rating Field */}
                 <div className="form-group">
-                  <label>How was your experience using our website?</label>
+                  <label>How was your experience?</label>
                   <div className="rating">
                     {Array.from({ length: 10 }, (_, i) => (
                       <span
@@ -153,23 +133,6 @@ const Review = () => {
                   </div>
                   <ErrorMessage
                     name="rating"
-                    component="div"
-                    className="error"
-                  />
-                </div>
-
-                {/* Source Dropdown */}
-                <div className="form-group">
-                  <label htmlFor="source">How did you hear about us?</label>
-                  <Field as="select" id="source" name="source">
-                    <option value="" label="Select an option" />
-                    <option value="friends">From Friends</option>
-                    <option value="family">From Family</option>
-                    <option value="advertisement">From an Advertisement</option>
-                    <option value="social-media">From Social Media</option>
-                  </Field>
-                  <ErrorMessage
-                    name="source"
                     component="div"
                     className="error"
                   />
@@ -198,11 +161,12 @@ const Review = () => {
                   {review.user && (
                     <div className="review-user">
                       <img
-                        src={review.user.profile.image}
+                        src={
+                          review.user.profile ? review.user.profile.image : ''
+                        }
                         alt={`${review.user.username}'s review`}
                       />
                       <h3>Username: {review.user.username}</h3>
-                      <br />
                       <h5>Created At: {review.created_at}</h5>
                       {review.updated_at !== review.created_at ? (
                         <h5>Updated At: {review.updated_at}</h5>
@@ -228,6 +192,6 @@ const Review = () => {
       <Footer />
     </div>
   );
-};
+}
 
 export default Review;
