@@ -28,7 +28,7 @@ function Discover({ user }) {
         <div className="site-card" key={site.id}>
           <img src={site.image} alt={site.name} />
           <div className="site-details">
-            <h5>{site.name}</h5>
+            <h5>Site {site.id}: {site.name}</h5>
             <p>{site.description}</p>
           </div>
         </div>
