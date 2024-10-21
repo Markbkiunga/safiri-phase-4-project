@@ -609,6 +609,14 @@ class LocationList(Resource):
             return jsonify({"error": str(e)}), 500
 
 
+class LocationDetail(Resource):
+    def get(self, id):
+        location = Location.query.get(id)
+        if not location:
+            return {"error": "Location not found"}, 404
+        return jsonify(location.to_dict())
+
+
 api.add_resource(Login, "/login", endpoint="login")
 api.add_resource(CheckSession, "/check_session", endpoint="check_session")
 api.add_resource(Logout, "/logout", endpoint="logout")
@@ -627,6 +635,7 @@ api.add_resource(SiteDetail, "/sites/<int:id>")
 api.add_resource(SiteActivityList, "/site_activities", endpoint="site_activities")
 api.add_resource(SiteActivityDetail, "/site_activities/<int:id>")
 api.add_resource(LocationList, "/locations")
+api.add_resource(LocationDetail, "/locations/<int:id>")
 
 
 if __name__ == "__main__":

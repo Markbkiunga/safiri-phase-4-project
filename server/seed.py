@@ -41,7 +41,7 @@ if __name__ == "__main__":
 
         # SEED LOCATIONS
         locations = []
-        for _ in range(5):
+        for _ in range(20):
             location = Location(
                 name=fake.city(),
                 image="https://picsum.photos/500/300",
@@ -83,7 +83,7 @@ if __name__ == "__main__":
 
         # SEED SITES
         sites = []
-        for _ in range(5):
+        for _ in range(20):
             site = Site(
                 name=fake.company(),
                 image='https://picsum.photos/100/100',

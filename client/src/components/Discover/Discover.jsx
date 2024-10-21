@@ -15,7 +15,6 @@ function Discover({ user }) {
     fetch('/locations')
       .then((response) => response.json())
       .then((placesData) => {
-        console.log(placesData);
         setOriginalPlaces(placesData); // Set original places
         setFilteredPlaces(placesData); // Also set as filtered initially
       });
@@ -28,9 +27,9 @@ function Discover({ user }) {
       return (
         <div className="site-card" key={site.id}>
           <img src={site.image} alt={site.name} />
-          <div className='site-details'>
-          <h5>{site.name}</h5>
-          <p>{site.description}</p>
+          <div className="site-details">
+            <h5>{site.name}</h5>
+            <p>{site.description}</p>
           </div>
         </div>
       );
@@ -50,7 +49,7 @@ function Discover({ user }) {
             >
               Save
             </button>
-            <h4>Sites:</h4>
+            {place.sites.length > 0 ? <h4>Sites:</h4> : ''}
             {displaySites}
           </div>
         </details>
@@ -63,7 +62,7 @@ function Discover({ user }) {
 
   function handleAddPlace(event) {
     const placeId = event.target.id;
-    fetch(`/places/${placeId}`)
+    fetch(`/locations/${placeId}`)
       .then((response) => response.json())
       .then((place) => {
         if (!savedPlaces.some((savedPlace) => savedPlace.id === place.id)) {
@@ -84,8 +83,8 @@ function Discover({ user }) {
         key={savedPlace.id}
         onClick={handleSavedPlaceClick}
       >
-        <h1>{savedPlace.title}</h1>
-        <h4>{savedPlace.transport_options}</h4>
+        <h1>{savedPlace.name}</h1>
+        <h4>{savedPlace.description}</h4>
         <button
           id={savedPlace.id}
           className="unsave-button"
