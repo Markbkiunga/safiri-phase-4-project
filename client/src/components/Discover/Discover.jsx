@@ -121,7 +121,7 @@ function Discover({ user }) {
 
     // Update filteredPlaces based on search input
     const searchedPlaces = originalPlaces.filter((place) => {
-      return place.title.toLowerCase().includes(searchValue.toLowerCase());
+      return place.name.toLowerCase().includes(searchValue.toLowerCase());
     });
 
     setFilteredPlaces(searchedPlaces);
