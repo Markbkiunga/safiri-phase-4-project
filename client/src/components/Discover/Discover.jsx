@@ -12,9 +12,10 @@ function Discover({ user }) {
 
   // Fetch Places
   useEffect(() => {
-    fetch('/places')
+    fetch('/locations')
       .then((response) => response.json())
       .then((placesData) => {
+        console.log(placesData);
         setOriginalPlaces(placesData); // Set original places
         setFilteredPlaces(placesData); // Also set as filtered initially
       });
@@ -22,16 +23,24 @@ function Discover({ user }) {
 
   // Display places by iterating through filteredPlaces
   //   let [likedHeart, setLikedHeart] = useState(false);
-
   const displayPlaces = filteredPlaces.map((place) => {
+    const displaySites = place.sites.map((site) => {
+      return (
+        <div className="site-card" key={site.id}>
+          <img src={site.image} alt={site.name} />
+          <div className='site-details'>
+          <h5>{site.name}</h5>
+          <p>{site.description}</p>
+          </div>
+        </div>
+      );
+    });
     return (
       <div className="place-card" key={place.id}>
         <details>
           <summary>
-            <video autoPlay muted loop className="place-video" id={place.id}>
-              <source src={place.image} type="video/mp4"></source>
-            </video>
-            <h1>{place.title}</h1>
+            <img src={place.image} alt={place.name} className="place-image" />
+            <h1>{place.name}</h1>
           </summary>
           <div className="details-content">
             <button
@@ -40,11 +49,9 @@ function Discover({ user }) {
               onClick={handleAddPlace}
             >
               Save
-              {/* {likedHeart ? '♥' : '♡'}
-              {likedHeart ? 'Save/' : 'Unsave'} */}
             </button>
-            <h4>{place.description}</h4>
-            <h5>{place.activities}</h5>
+            <h4>Sites:</h4>
+            {displaySites}
           </div>
         </details>
       </div>

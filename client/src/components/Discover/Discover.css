@@ -60,7 +60,22 @@
   border-radius: 10px;
   text-align: center;
 }
-
+.site-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px #ddd solid;
+  margin-bottom: 5px;
+  border-radius: 10px;
+}
+.site-card img {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+}
+.site-card div {
+  width: 300px;
+}
 details summary {
   cursor: pointer;
 }
@@ -79,13 +94,13 @@ details[open] div {
   }
 }
 
-.place-video {
-  width: 100%;
-  height: fit-content;
+.place-image {
+  width: 500px;
+  height: 300px;
   border: solid 1px #ddd;
   transition: transform 0.3s ease-in-out;
 }
-.place-video:hover {
+.place-image:hover {
   cursor: pointer;
   transform: scale(1.01);
 }
@@ -129,7 +144,7 @@ details[open] div {
   .place-card {
     width: 200px;
   }
-  .place-video {
+  .place-image {
     width: 100%;
     height: fit-content;
   }
@@ -138,7 +153,7 @@ details[open] div {
   .place-card {
     width: 200px;
   }
-  .place-video {
+  .place-image {
     width: 100%;
     height: fit-content;
   }

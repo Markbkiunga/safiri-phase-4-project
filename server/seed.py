@@ -8,9 +8,19 @@ from faker import Faker
 
 # Local imports
 from app import app
-from models import db, User, Profile, UserActivity, Review, Activity, Site, SiteActivity, Location
+from models import (
+    db,
+    User,
+    Profile,
+    UserActivity,
+    Review,
+    Activity,
+    Site,
+    SiteActivity,
+    Location,
+)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     fake = Faker()
 
     with app.app_context():
@@ -34,7 +44,7 @@ if __name__ == '__main__':
         for _ in range(5):
             location = Location(
                 name=fake.city(),
-                image=fake.image_url(),
+                image="https://picsum.photos/500/300",
                 description=fake.text(),
             )
             locations.append(location)
@@ -58,15 +68,15 @@ if __name__ == '__main__':
                 image=fake.image_url(),
                 bio=fake.text(),
                 phone_number=fake.phone_number(),
-                user=user
+                user=user,
             )
 
             users.append(user)
             profiles.append(profile)
             db.session.add(user)
             db.session.add(profile)
-        test_user = User(username= 'markbkiunga')
-        test_user.set_password('markbkiungapassword')
+        test_user = User(username="markbkiunga")
+        test_user.set_password("markbkiungapassword")
         db.session.add(test_user)
 
         db.session.commit()
@@ -76,11 +86,11 @@ if __name__ == '__main__':
         for _ in range(5):
             site = Site(
                 name=fake.company(),
-                image=fake.image_url(),
+                image='https://picsum.photos/100/100',
                 description=fake.text(),
                 is_saved=False,
                 category=rc(["Historical", "Adventure", "Leisure"]),
-                location=rc(locations)
+                location=rc(locations),
             )
             sites.append(site)
             db.session.add(site)
@@ -106,7 +116,7 @@ if __name__ == '__main__':
                 feedback=fake.text(),
                 participation_date=fake.date_time_this_year(),
                 user=rc(users),
-                activity=rc(activities)
+                activity=rc(activities),
             )
             db.session.add(user_activity)
 
@@ -114,10 +124,7 @@ if __name__ == '__main__':
 
         # SEED SITE ACTIVITIES
         for _ in range(5):
-            site_activity = SiteActivity(
-                activity=rc(activities),
-                site=rc(sites)
-            )
+            site_activity = SiteActivity(activity=rc(activities), site=rc(sites))
             db.session.add(site_activity)
 
         db.session.commit()
@@ -128,7 +135,7 @@ if __name__ == '__main__':
                 description=fake.text(),
                 rating=randint(1, 10),
                 user=rc(users),
-                site=rc(sites)
+                site=rc(sites),
             )
             db.session.add(review)
 
