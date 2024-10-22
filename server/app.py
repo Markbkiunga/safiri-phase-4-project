@@ -22,13 +22,10 @@ from models import (
     Activity,
 )
 
-from werkzeug.security import generate_password_hash, check_password_hash
 
 from datetime import datetime
 import pytz
 
-
-from sqlalchemy.exc import IntegrityError
 
 gmt_plus_3 = pytz.timezone("Africa/Nairobi")
 
