@@ -66,7 +66,7 @@ function Signup() {
             navigate('/');
           }}
         >
-          X
+          ❌
         </button>
         {error && <p style={{ color: 'red', fontSize: 'small' }}>{error}</p>}
       </form>
