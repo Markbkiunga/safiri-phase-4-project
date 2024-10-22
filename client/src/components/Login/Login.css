@@ -18,6 +18,7 @@
   border: 1px solid #ccc;
   transition: border-color 0.3s ease;
   box-sizing: border-box;
+  
 }
 .login-input:focus{
   border-color: #007bff;
@@ -36,7 +37,6 @@
   cursor: pointer;
   background-color: #28a745;
   transition: background-color 0.3s;
-
   margin-bottom: 5px;
 }
 

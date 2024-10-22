@@ -74,7 +74,7 @@
 
 .slide-in-left {
   display: inline-block; 
-  animation: slideInLeft 11s ease forwards; 
+  animation: slideInLeft 5s ease forwards; 
   animation-iteration-count: 1; 
   margin: 15px 0;
 }
