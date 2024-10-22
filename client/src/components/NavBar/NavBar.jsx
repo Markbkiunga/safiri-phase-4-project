@@ -3,7 +3,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import './NavBar.css';
 import logo from '../pictures/logo.png';
 
-
 const NavBar = ({ setUser, user }) => {
   const navigate = useNavigate();
 
@@ -33,7 +32,7 @@ const NavBar = ({ setUser, user }) => {
   return (
     <nav className="navbar">
       <a href="/">
-      <img src={logo} alt="Site Logo" className="navbar-logo" />
+        <img src={logo} alt="Site Logo" className="navbar-logo" />
       </a>
       <ul className="navbar-links">
         <li>
@@ -53,11 +52,11 @@ const NavBar = ({ setUser, user }) => {
         </li>
 
         <li>
-        <button
+          <button
             onClick={() => {
               navigate('/login');
             }}
-            className="navbar-sign-button" 
+            className="navbar-sign-button"
           >
             Login
           </button>
@@ -69,20 +68,8 @@ const NavBar = ({ setUser, user }) => {
           Logout User {user.id}
         </button>
       )}
-
-      {!user && (
-        <button
-          onClick={() => {
-            navigate('/login');
-          }}
-          id="login-button"
-        >
-          <p>Login</p>
-        </button>
-      )}
-
     </nav>
   );
-};  
+};
 
 export default NavBar;
