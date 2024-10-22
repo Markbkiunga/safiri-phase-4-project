@@ -2,7 +2,7 @@
   "name": "phase2project",
   "version": "0.1.0",
   "private": true,
-  "proxy": "http://127.0.0.1:5555",
+  "proxy": "https://safiri-phase-4-project.onrender.com",
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.6.0",
     "@fortawesome/free-solid-svg-icons": "^6.6.0",
