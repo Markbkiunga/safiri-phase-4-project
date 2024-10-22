@@ -1,4 +1,4 @@
-#signup-form {
+/* #signup-form {
   margin-top: 100px;
   display: flex;
   flex-direction: column;
@@ -23,4 +23,101 @@
 }
 #safiri-logo {
   width: 150px;
+} */
+
+#signup-form-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: #f0f0f0; 
+}
+
+#signup-form {
+  background: #fff; 
+  padding: 40px; 
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); 
+  border-radius: 18px; 
+  width: 350px; 
+  text-align: center; 
+}
+
+#safiri-logo {
+  width: 100px; 
+  margin-bottom: 20px; 
+}
+
+#signup-form h1 {
+  font-size: 1.8em; 
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.signup-input {
+  width: 100%; 
+  padding: 10px; 
+  margin: 10px 0;
+  border: 1px solid #ccc; 
+  border-radius: 5px;
+  font-size: 1em;
+}
+
+.signup-input:focus {
+  border-color: #ffaf00; 
+  outline: none; 
+}
+
+#signup-button {
+  width: 100%; 
+  padding: 12px; 
+  background-color: #ffaf00; 
+  color: #fff;
+  border: none; 
+  border-radius: 5px; 
+  font-size: 1.1em; 
+  cursor: pointer; 
+  transition: background-color 0.3s ease;
+}
+
+#signup-button:hover {
+  background-color: #e69e00; 
+}
+
+#error-message {
+  color: red; 
+  font-size: small; 
+  margin-top: 10px; 
+}
+
+#login-button {
+  margin-top: 15px; 
+  width: 100%; 
+  padding: 12px; 
+  background-color: rgba(255, 255, 255, 0.1); 
+  color: #fff;
+  border: none; 
+  border-radius: 5px;
+  font-size: 1em; 
+  cursor: pointer; 
+  transition: background-color 0.3s ease; 
+}
+
+#login-button:hover {
+  background-color: rgba(255, 215, 0, 0.8); 
+
+
+}
+
+
+.fade-in {
+  animation: fadeIn 5s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }

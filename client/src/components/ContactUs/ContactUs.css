@@ -1,15 +1,20 @@
 #contactus-page {
   display: flex;
+  position: relative;
+  overflow: hidden;
 }
 #safiri-logo {
   width: 150px;
+  margin-bottom: 20px;
 }
 .contact-us {
+  position: relative;
+  z-index: 1;
   height: 100%;
-  background-image: url('https://media.istockphoto.com/id/1864834686/photo/e-mail-button-gold-3d-illustration.webp?b=1&s=612x612&w=0&k=20&c=8gxoUEBJP-q9Td-0C573kljDAObouSLuR8UxZRi-Q4Y=');
+  background-image: url(https://img.freepik.com/free-photo/tourist-carrying-luggage_23-2151747324.jpg?t=st=1729536901~exp=1729540501~hmac=07611d57fefbd649dc9d498fe1ea97b618014f9d666d7e3190b3f7f09300d9e2&w=1380); 
   background-size: cover;
   background-position: center;
-  color: black;
+  color: white;
   padding: 20px;
   text-align: center;
   box-sizing: border-box;
@@ -53,4 +58,23 @@
   bottom: 0px;
   height: 5px;
   width: 100%;
+}
+
+
+@keyframes slideInLeft {
+  0% {
+    transform: translateX(-100%); 
+    opacity: 0; 
+  }
+  100% {
+    transform: translateX(0); 
+    opacity: 1; 
+  }
+}
+
+.slide-in-left {
+  display: inline-block; 
+  animation: slideInLeft 5s ease forwards; 
+  animation-iteration-count: 1; 
+  margin: 15px 0;
 }

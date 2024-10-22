@@ -6,6 +6,7 @@ import logo from '../pictures/logo.png';
 
 const NavBar = ({ setUser, user }) => {
   const navigate = useNavigate();
+
   useEffect(() => {
     let lastScrollTop = 0;
     const navbar = document.querySelector('.navbar');
@@ -22,11 +23,13 @@ const NavBar = ({ setUser, user }) => {
       lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
     });
   }, []);
+
   function handleLogout() {
     fetch('/logout', {
       method: 'DELETE',
     }).then(() => setUser(null));
   }
+
   return (
     <nav className="navbar">
       <a href="/">
@@ -48,6 +51,17 @@ const NavBar = ({ setUser, user }) => {
         <li>
           <Link to="/ContactUs">ContactUs</Link>
         </li>
+
+        <li>
+        <button
+            onClick={() => {
+              navigate('/login');
+            }}
+            className="navbar-sign-button" 
+          >
+            Login
+          </button>
+        </li>
       </ul>
 
       {user && (
@@ -55,6 +69,7 @@ const NavBar = ({ setUser, user }) => {
           Logout User {user.id}
         </button>
       )}
+
       {!user && (
         <button
           onClick={() => {
@@ -65,8 +80,9 @@ const NavBar = ({ setUser, user }) => {
           <p>Login</p>
         </button>
       )}
+
     </nav>
   );
-};
+};  
 
 export default NavBar;

@@ -10,6 +10,7 @@ import Signup from './components/Signup/Signup';
 import Login from './components/Login/Login';
 import { useState, useEffect } from 'react';
 
+
 function App() {
   const [user, setUser] = useState(null);
 
