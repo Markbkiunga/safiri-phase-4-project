@@ -17,8 +17,6 @@ function Review({ user }) {
         if (!response.ok) throw new Error('Failed to fetch reviews');
         const data = await response.json();
         setReviews(data);
-        console.log(data);
-        // console.log(user);
       } catch (error) {
         console.error('Error fetching reviews:', error);
       }
