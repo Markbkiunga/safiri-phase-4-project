@@ -83,7 +83,7 @@
   background-color: #e69e00; 
 }
 
-.error-message {
+#error-message {
   color: red; 
   font-size: small; 
   margin-top: 10px; 
