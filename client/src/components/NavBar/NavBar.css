@@ -51,17 +51,19 @@
   height: 5%;
   width: 5%;
 }
-nav button {
+
+.navbar-sign-button {
   color: #fff;
   text-decoration: none;
-  padding: 5px 10px;
+  padding: 10px 20px;
   background-color: rgba(255, 255, 255, 0.1);
   border-radius: 5px;
   transition: background-color 0.3s ease, color 0.3s ease;
+  border: none; 
 }
-nav button:hover {
+
+.navbar-sign-button:hover {
   background-color: rgba(255, 215, 0, 0.8);
   color: #000;
-  text-decoration: none;
   cursor: pointer;
 }
