@@ -30,11 +30,6 @@
 #login-button {
    position: relative; 
   width: 5%;
-}
-
-#login-login-button {
-  position: relative;
-  width: 100%;
   padding: 10px; 
   border: none; 
   border-radius: 5px; 
@@ -43,7 +38,6 @@
   font-weight: bold;
   cursor: pointer;
   transition: background-color 0.3s;
-
   margin-bottom: 5px;
 }
 
