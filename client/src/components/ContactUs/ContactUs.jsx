@@ -4,10 +4,10 @@ import NavBar from '../NavBar/NavBar';
 import logo from '../pictures/SAFIRI LOGO.png';
 import Footer from '../Footer/Footer';
 
-const ContactUs = () => {
+const ContactUs = ({ user }) => {
   return (
     <div id="contactus-page">
-      <NavBar />
+      <NavBar user={user} />
 
       <div className="contact-us">
         <img src={logo} alt="safiri-logo" id="safiri-logo" />

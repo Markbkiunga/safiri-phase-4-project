@@ -11,7 +11,16 @@ from flask_restful import Resource, Api, reqparse
 from config import app, db, api
 
 # Add your model imports
-from models import User, Profile, UserActivity, Review, SiteActivity, Site, Location, Activity
+from models import (
+    User,
+    Profile,
+    UserActivity,
+    Review,
+    SiteActivity,
+    Site,
+    Location,
+    Activity,
+)
 
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -23,10 +32,7 @@ from sqlalchemy.exc import IntegrityError
 
 gmt_plus_3 = pytz.timezone("Africa/Nairobi")
 
-#initializing Flask-Restful Api
-
-
-
+# initializing Flask-Restful Api
 
 
 @app.route("/")
@@ -82,11 +88,13 @@ class Signup(Resource):
         except Exception as e:
             print(e)
             return {"error": f"{str(e)}"}, 500
-        
+
+
 class UserList(Resource):
     def get(self):
         users = User.query.all()
         return jsonify([user.to_dict() for user in users])
+
 
 class UserDetail(Resource):
     def get(self, user_id):
@@ -102,20 +110,20 @@ class UserDetail(Resource):
 
         # Parse input data to update user profile
         parser = reqparse.RequestParser()
-        parser.add_argument('first_name', type=str)
-        parser.add_argument('last_name', type=str)
-        parser.add_argument('email', type=str)
-        parser.add_argument('bio', type=str)
-        parser.add_argument('phone_number', type=str)
+        parser.add_argument("first_name", type=str)
+        parser.add_argument("last_name", type=str)
+        parser.add_argument("email", type=str)
+        parser.add_argument("bio", type=str)
+        parser.add_argument("phone_number", type=str)
         data = parser.parse_args()
 
         # Update the profile with the new data
         profile = user.profile
-        profile.first_name = data.get('first_name', profile.first_name)
-        profile.last_name = data.get('last_name', profile.last_name)
-        profile.email = data.get('email', profile.email)
-        profile.bio = data.get('bio', profile.bio)
-        profile.phone_number = data.get('phone_number', profile.phone_number)
+        profile.first_name = data.get("first_name", profile.first_name)
+        profile.last_name = data.get("last_name", profile.last_name)
+        profile.email = data.get("email", profile.email)
+        profile.bio = data.get("bio", profile.bio)
+        profile.phone_number = data.get("phone_number", profile.phone_number)
 
         # Save the updated profile
         db.session.commit()
@@ -130,6 +138,7 @@ class UserDetail(Resource):
         db.session.commit()
         return make_response(jsonify({"message": "User deleted successfully"}), 200)
 
+
 # Class to get and create reviews
 class ReviewList(Resource):
     def get(self):
@@ -138,34 +147,45 @@ class ReviewList(Resource):
         return jsonify([review.to_dict() for review in reviews])
 
     def post(self):
+        if not session["user_id"]:
+            print("User not logged in")
+            return make_response({"error": "User not logged in"}, 401)
+
         # Parse input data
         parser = reqparse.RequestParser()
-        parser.add_argument('description', required=True, help="Description is required")
-        parser.add_argument('rating', type=int, required=True, help="Rating is required")
-        parser.add_argument('user_id', type=int, required=True)
-        parser.add_argument('site_id', type=int, required=True)
+        parser.add_argument("reviewText", required=True, help="Description is required")
+        parser.add_argument(
+            "rating", type=int, required=True, help="Rating is required"
+        )
+        parser.add_argument("userId", type=int, required=True)
+        parser.add_argument("siteId", type=int, required=True)
         data = parser.parse_args()
 
         # Check if user and site exist
-        user = User.query.get(data['user_id'])
-        site = Site.query.get(data['site_id'])
+        user = User.query.get(data["userId"])
+        site = Site.query.get(data["siteId"])
 
         if not user or not site:
             return jsonify({"error": "User or Site not found"}), 404
 
         # Create a new review
-        new_review = Review(
-            description=data['description'],
-            rating=data['rating'],
-            user_id=user.id,
-            site_id=site.id,
-            created_at=datetime.now(gmt_plus_3)
-        )
+        try:
+            new_review = Review(
+                description=data["reviewText"],
+                rating=data["rating"],
+                user_id=user.id,
+                site_id=site.id,
+                created_at=datetime.now(gmt_plus_3),
+            )
 
-        # Save the review in the database
-        db.session.add(new_review)
-        db.session.commit()
-        return jsonify(new_review.to_dict()), 201
+            # Save the review in the database
+            db.session.add(new_review)
+            db.session.commit()
+            return new_review.to_dict(), 201
+        except Exception as e:
+            print(e)
+            return jsonify({"error": f"{e}"}), 500
+
 
 # Class to handle individual review actions
 class ReviewDetail(Resource):
@@ -182,12 +202,12 @@ class ReviewDetail(Resource):
 
         # Parse input data to update review
         parser = reqparse.RequestParser()
-        parser.add_argument('description', type=str)
-        parser.add_argument('rating', type=int)
+        parser.add_argument("description", type=str)
+        parser.add_argument("rating", type=int)
         data = parser.parse_args()
 
-        review.description = data.get('description', review.description)
-        review.rating = data.get('rating', review.rating)
+        review.description = data.get("description", review.description)
+        review.rating = data.get("rating", review.rating)
         review.updated_at = datetime.now(gmt_plus_3)
 
         db.session.commit()
@@ -201,7 +221,8 @@ class ReviewDetail(Resource):
         db.session.delete(review)
         db.session.commit()
         return jsonify({"message": "Review deleted successfully"})
-    
+
+
 # Profile Resource
 class ProfileDetail(Resource):
     def get(self, user_id):
@@ -216,18 +237,18 @@ class ProfileDetail(Resource):
             return make_response(jsonify({"error": "Profile not found"}), 404)
 
         parser = reqparse.RequestParser()
-        parser.add_argument('first_name', type=str)
-        parser.add_argument('last_name', type=str)
-        parser.add_argument('email', type=str)
-        parser.add_argument('bio', type=str)
-        parser.add_argument('phone_number', type=str)
+        parser.add_argument("first_name", type=str)
+        parser.add_argument("last_name", type=str)
+        parser.add_argument("email", type=str)
+        parser.add_argument("bio", type=str)
+        parser.add_argument("phone_number", type=str)
         data = parser.parse_args()
 
-        profile.first_name = data.get('first_name', profile.first_name)
-        profile.last_name = data.get('last_name', profile.last_name)
-        profile.email = data.get('email', profile.email)
-        profile.bio = data.get('bio', profile.bio)
-        profile.phone_number = data.get('phone_number', profile.phone_number)
+        profile.first_name = data.get("first_name", profile.first_name)
+        profile.last_name = data.get("last_name", profile.last_name)
+        profile.email = data.get("email", profile.email)
+        profile.bio = data.get("bio", profile.bio)
+        profile.phone_number = data.get("phone_number", profile.phone_number)
 
         try:
             db.session.commit()
@@ -244,11 +265,14 @@ class ProfileDetail(Resource):
         try:
             db.session.delete(profile)
             db.session.commit()
-            return make_response(jsonify({"message": "Profile deleted successfully"}), 200)
+            return make_response(
+                jsonify({"message": "Profile deleted successfully"}), 200
+            )
         except Exception as e:
             db.session.rollback()
             return make_response(jsonify({"error": str(e)}), 500)
-        
+
+
 # Activity Resource
 class ActivityList(Resource):
     def get(self):
@@ -257,17 +281,17 @@ class ActivityList(Resource):
 
     def post(self):
         parser = reqparse.RequestParser()
-        parser.add_argument('name', required=True, help="Name is required")
-        parser.add_argument('description', type=str)
-        parser.add_argument('category', type=str)
+        parser.add_argument("name", required=True, help="Name is required")
+        parser.add_argument("description", type=str)
+        parser.add_argument("category", type=str)
         data = parser.parse_args()
 
         new_activity = Activity(
-            name=data['name'],
-            description=data.get('description', ''),
-            category=data.get('category', ''),
+            name=data["name"],
+            description=data.get("description", ""),
+            category=data.get("category", ""),
             created_at=datetime.now(gmt_plus_3),
-            updated_at=datetime.now(gmt_plus_3)
+            updated_at=datetime.now(gmt_plus_3),
         )
 
         try:
@@ -277,6 +301,7 @@ class ActivityList(Resource):
         except Exception as e:
             db.session.rollback()
             return jsonify({"error": str(e)}), 500
+
 
 class ActivityDetail(Resource):
     def get(self, id):
@@ -291,14 +316,14 @@ class ActivityDetail(Resource):
             return jsonify({"error": "Activity not found"}), 404
 
         parser = reqparse.RequestParser()
-        parser.add_argument('name', type=str)
-        parser.add_argument('description', type=str)
-        parser.add_argument('category', type=str)
+        parser.add_argument("name", type=str)
+        parser.add_argument("description", type=str)
+        parser.add_argument("category", type=str)
         data = parser.parse_args()
 
-        activity.name = data.get('name', activity.name)
-        activity.description = data.get('description', activity.description)
-        activity.category = data.get('category', activity.category)
+        activity.name = data.get("name", activity.name)
+        activity.description = data.get("description", activity.description)
+        activity.category = data.get("category", activity.category)
         activity.updated_at = datetime.now(gmt_plus_3)
 
         try:
@@ -320,7 +345,8 @@ class ActivityDetail(Resource):
         except Exception as e:
             db.session.rollback()
             return jsonify({"error": str(e)}), 500
-        
+
+
 # UserActivity Resource
 class UserActivityList(Resource):
     def get(self):
@@ -329,19 +355,23 @@ class UserActivityList(Resource):
 
     def post(self):
         parser = reqparse.RequestParser()
-        parser.add_argument('user_id', required=True, help="User ID is required")
-        parser.add_argument('activity_id', required=True, help="Activity ID is required")
-        parser.add_argument('feedback', type=str)
-        parser.add_argument('participation_date', type=str, default=str(datetime.now(gmt_plus_3)))
+        parser.add_argument("user_id", required=True, help="User ID is required")
+        parser.add_argument(
+            "activity_id", required=True, help="Activity ID is required"
+        )
+        parser.add_argument("feedback", type=str)
+        parser.add_argument(
+            "participation_date", type=str, default=str(datetime.now(gmt_plus_3))
+        )
         data = parser.parse_args()
 
         new_user_activity = UserActivity(
-            user_id=data['user_id'],
-            activity_id=data['activity_id'],
-            feedback=data.get('feedback', ''),
+            user_id=data["user_id"],
+            activity_id=data["activity_id"],
+            feedback=data.get("feedback", ""),
             participation_date=datetime.now(gmt_plus_3),
             created_at=datetime.now(gmt_plus_3),
-            updated_at=datetime.now(gmt_plus_3)
+            updated_at=datetime.now(gmt_plus_3),
         )
 
         try:
@@ -351,6 +381,7 @@ class UserActivityList(Resource):
         except Exception as e:
             db.session.rollback()
             return jsonify({"error": str(e)}), 500
+
 
 class UserActivityDetail(Resource):
     def get(self, id):
@@ -365,10 +396,10 @@ class UserActivityDetail(Resource):
             return jsonify({"error": "User Activity not found"}), 404
 
         parser = reqparse.RequestParser()
-        parser.add_argument('feedback', type=str)
+        parser.add_argument("feedback", type=str)
         data = parser.parse_args()
 
-        user_activity.feedback = data.get('feedback', user_activity.feedback)
+        user_activity.feedback = data.get("feedback", user_activity.feedback)
         user_activity.updated_at = datetime.now(gmt_plus_3)
 
         try:
@@ -390,7 +421,8 @@ class UserActivityDetail(Resource):
         except Exception as e:
             db.session.rollback()
             return jsonify({"error": str(e)}), 500
-        
+
+
 # Site Resource
 class SiteList(Resource):
     def get(self):
@@ -399,17 +431,17 @@ class SiteList(Resource):
 
     def post(self):
         parser = reqparse.RequestParser()
-        parser.add_argument('name', required=True, help="Name is required")
-        parser.add_argument('description', type=str)
-        parser.add_argument('category', type=str)
-        parser.add_argument('location_id', type=int, required=True)
+        parser.add_argument("name", required=True, help="Name is required")
+        parser.add_argument("description", type=str)
+        parser.add_argument("category", type=str)
+        parser.add_argument("location_id", type=int, required=True)
         data = parser.parse_args()
 
         new_site = Site(
-            name=data['name'],
-            description=data.get('description', ''),
-            category=data.get('category', ''),
-            location_id=data['location_id']
+            name=data["name"],
+            description=data.get("description", ""),
+            category=data.get("category", ""),
+            location_id=data["location_id"],
         )
 
         try:
@@ -419,6 +451,7 @@ class SiteList(Resource):
         except Exception as e:
             db.session.rollback()
             return jsonify({"error": str(e)}), 500
+
 
 class SiteDetail(Resource):
     def get(self, id):
@@ -433,14 +466,14 @@ class SiteDetail(Resource):
             return jsonify({"error": "Site not found"}), 404
 
         parser = reqparse.RequestParser()
-        parser.add_argument('name', type=str)
-        parser.add_argument('description', type=str)
-        parser.add_argument('category', type=str)
+        parser.add_argument("name", type=str)
+        parser.add_argument("description", type=str)
+        parser.add_argument("category", type=str)
         data = parser.parse_args()
 
-        site.name = data.get('name', site.name)
-        site.description = data.get('description', site.description)
-        site.category = data.get('category', site.category)
+        site.name = data.get("name", site.name)
+        site.description = data.get("description", site.description)
+        site.category = data.get("category", site.category)
 
         try:
             db.session.commit()
@@ -462,29 +495,41 @@ class SiteDetail(Resource):
             db.session.rollback()
             return jsonify({"error": str(e)}), 500
 
+
 def serialize_site_activity(site_activity):
     return {
         "id": site_activity.id,
         "activity_id": site_activity.activity_id,
         "site_id": site_activity.site_id,
-        "created_at": site_activity.created_at.isoformat() if site_activity.created_at else None,
-        "updated_at": site_activity.updated_at.isoformat() if site_activity.updated_at else None
+        "created_at": (
+            site_activity.created_at.isoformat() if site_activity.created_at else None
+        ),
+        "updated_at": (
+            site_activity.updated_at.isoformat() if site_activity.updated_at else None
+        ),
     }
+
 
 class SiteActivityList(Resource):
     def get(self):
         site_activities = SiteActivity.query.all()
-        return jsonify([serialize_site_activity(site_activity) for site_activity in site_activities])
+        return jsonify(
+            [
+                serialize_site_activity(site_activity)
+                for site_activity in site_activities
+            ]
+        )
 
     def post(self):
         parser = reqparse.RequestParser()
-        parser.add_argument('activity_id', required=True, help="Activity ID is required")
-        parser.add_argument('site_id', required=True, help="Site ID is required")
+        parser.add_argument(
+            "activity_id", required=True, help="Activity ID is required"
+        )
+        parser.add_argument("site_id", required=True, help="Site ID is required")
         data = parser.parse_args()
 
         new_site_activity = SiteActivity(
-            activity_id=data['activity_id'],
-            site_id=data['site_id']
+            activity_id=data["activity_id"], site_id=data["site_id"]
         )
 
         try:
@@ -509,14 +554,14 @@ class SiteActivityDetail(Resource):
             return jsonify({"error": "SiteActivity not found"}), 404
 
         parser = reqparse.RequestParser()
-        parser.add_argument('activity_id', type=int)
-        parser.add_argument('site_id', type=int)
+        parser.add_argument("activity_id", type=int)
+        parser.add_argument("site_id", type=int)
         data = parser.parse_args()
 
-        if data['activity_id'] is not None:
-            site_activity.activity_id = data['activity_id']
-        if data['site_id'] is not None:
-            site_activity.site_id = data['site_id']
+        if data["activity_id"] is not None:
+            site_activity.activity_id = data["activity_id"]
+        if data["site_id"] is not None:
+            site_activity.site_id = data["site_id"]
 
         try:
             db.session.commit()
@@ -538,6 +583,7 @@ class SiteActivityDetail(Resource):
             db.session.rollback()
             return jsonify({"error": str(e)}), 500
 
+
 # Location Resource
 class LocationList(Resource):
     def get(self):
@@ -546,13 +592,12 @@ class LocationList(Resource):
 
     def post(self):
         parser = reqparse.RequestParser()
-        parser.add_argument('name', required=True, help="Name is required")
-        parser.add_argument('description', type=str)
+        parser.add_argument("name", required=True, help="Name is required")
+        parser.add_argument("description", type=str)
         data = parser.parse_args()
 
         new_location = Location(
-            name=data['name'],
-            description=data.get('description', '')
+            name=data["name"], description=data.get("description", "")
         )
 
         try:
@@ -563,92 +608,34 @@ class LocationList(Resource):
             db.session.rollback()
             return jsonify({"error": str(e)}), 500
 
-# Class to get and create reviews
-class ReviewList(Resource):
-    def get(self):
-        reviews = Review.query.all()
-        return jsonify([review.to_dict() for review in reviews])
 
-    def post(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('description', required=True, help="Description is required")
-        parser.add_argument('rating', type=int, required=True, help="Rating is required")
-        parser.add_argument('user_id', type=int, required=True)
-        parser.add_argument('site_id', type=int, required=True)
-        data = parser.parse_args()
-
-        user = User.query.get(data['user_id'])
-        site = Site.query.get(data['site_id'])
-
-        if not user or not site:
-            return jsonify({"error": "User or Site not found"}), 404
-
-        new_review = Review(
-            description=data['description'],
-            rating=data['rating'],
-            user_id=user.id,
-            site_id=site.id,
-            created_at=datetime.now(gmt_plus_3)
-        )
-
-        db.session.add(new_review)
-        db.session.commit()
-        return jsonify(new_review.to_dict()), 201
-
-class ReviewDetail(Resource):
+class LocationDetail(Resource):
     def get(self, id):
-        review = Review.query.get(id)
-        if not review:
-            return jsonify({"error": "Review not found"}), 404
-        return jsonify(review.to_dict())
-
-    def patch(self, id):
-        review = Review.query.get(id)
-        if not review:
-            return jsonify({"error": "Review not found"}), 404
-
-        parser = reqparse.RequestParser()
-        parser.add_argument('description', type=str)
-        parser.add_argument('rating', type=int)
-        data = parser.parse_args()
-
-        review.description = data.get('description', review.description)
-        review.rating = data.get('rating', review.rating)
-        review.updated_at = datetime.now(gmt_plus_3)
-
-        db.session.commit()
-        return jsonify(review.to_dict())
-
-    def delete(self, id):
-        review = Review.query.get(id)
-        if not review:
-            return jsonify({"error": "Review not found"}), 404
-
-        db.session.delete(review)
-        db.session.commit()
-        return jsonify({"message": "Review deleted successfully"})
+        location = Location.query.get(id)
+        if not location:
+            return {"error": "Location not found"}, 404
+        return jsonify(location.to_dict())
 
 
 api.add_resource(Login, "/login", endpoint="login")
 api.add_resource(CheckSession, "/check_session", endpoint="check_session")
 api.add_resource(Logout, "/logout", endpoint="logout")
 api.add_resource(Signup, "/signup", endpoint="signup")
-api.add_resource(UserList, '/users', endpoint='users')
-api.add_resource(UserDetail, '/users/<int:user_id>')
-api.add_resource(ReviewList, '/reviews', endpoint='reviews')
-api.add_resource(ReviewDetail, '/reviews/<int:id>', endpoint='review_detail')
-api.add_resource(ProfileDetail, '/profiles/<int:user_id>')
-api.add_resource(ActivityList, '/activities')
-api.add_resource(ActivityDetail, '/activities/<int:id>')
-api.add_resource(UserActivityList, '/user_activities')
-api.add_resource(UserActivityDetail, '/user_activities/<int:id>')
-api.add_resource(SiteList, '/sites')
-api.add_resource(SiteDetail, '/sites/<int:id>')
-api.add_resource(SiteActivityList, '/site_activities', endpoint='site_activities')
-api.add_resource(SiteActivityDetail, '/site_activities/<int:id>')
-
-api.add_resource(LocationList, '/locations')
-
+api.add_resource(UserList, "/users", endpoint="users")
+api.add_resource(UserDetail, "/users/<int:user_id>")
+api.add_resource(ReviewList, "/reviews", endpoint="reviews")
+api.add_resource(ReviewDetail, "/reviews/<int:id>", endpoint="review_detail")
+api.add_resource(ProfileDetail, "/profiles/<int:user_id>")
+api.add_resource(ActivityList, "/activities")
+api.add_resource(ActivityDetail, "/activities/<int:id>")
+api.add_resource(UserActivityList, "/user_activities")
+api.add_resource(UserActivityDetail, "/user_activities/<int:id>")
+api.add_resource(SiteList, "/sites")
+api.add_resource(SiteDetail, "/sites/<int:id>")
+api.add_resource(SiteActivityList, "/site_activities", endpoint="site_activities")
+api.add_resource(SiteActivityDetail, "/site_activities/<int:id>")
+api.add_resource(LocationList, "/locations")
+api.add_resource(LocationDetail, "/locations/<int:id>")
 
 
 if __name__ == "__main__":

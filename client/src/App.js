@@ -25,12 +25,15 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Home setUser={setUser} user={user} />} />
-        <Route path="/discover" element={<Discover />} />
-        <Route path="/about" element={<AboutUs />} />
-        <Route path="/review" element={<Review />} />
-        <Route path="/ContactUs" element={<ContactUs />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/login" element={<Login setUser={setUser} user={user} />} />
+        <Route path="/discover" element={<Discover user={user} />} />
+        <Route path="/about" element={<AboutUs user={user} />} />
+        <Route path="/review" element={<Review user={user} />} />
+        <Route path="/ContactUs" element={<ContactUs user={user} />} />
+        <Route path="/signup" element={<Signup user={user} />} />
+        <Route
+          path="/login"
+          element={<Login setUser={setUser} user={user} />}
+        />
       </Routes>
     </Router>
   );

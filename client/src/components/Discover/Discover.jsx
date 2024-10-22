@@ -4,7 +4,7 @@ import NavBar from '../NavBar/NavBar';
 import logo from '../pictures/SAFIRI LOGO.png';
 import Footer from '../Footer/Footer';
 
-function Discover() {
+function Discover({ user }) {
   // Original Places State
   const [originalPlaces, setOriginalPlaces] = useState([]);
   // Filtered Places State
@@ -12,7 +12,7 @@ function Discover() {
 
   // Fetch Places
   useEffect(() => {
-    fetch('/places')
+    fetch('/locations')
       .then((response) => response.json())
       .then((placesData) => {
         setOriginalPlaces(placesData); // Set original places
@@ -22,16 +22,24 @@ function Discover() {
 
   // Display places by iterating through filteredPlaces
   //   let [likedHeart, setLikedHeart] = useState(false);
-
   const displayPlaces = filteredPlaces.map((place) => {
+    const displaySites = place.sites.map((site) => {
+      return (
+        <div className="site-card" key={site.id}>
+          <img src={site.image} alt={site.name} />
+          <div className="site-details">
+            <h5>Site {site.id}: {site.name}</h5>
+            <p>{site.description}</p>
+          </div>
+        </div>
+      );
+    });
     return (
       <div className="place-card" key={place.id}>
         <details>
           <summary>
-            <video autoPlay muted loop className="place-video" id={place.id}>
-              <source src={place.image} type="video/mp4"></source>
-            </video>
-            <h1>{place.title}</h1>
+            <img src={place.image} alt={place.name} className="place-image" />
+            <h1>{place.name}</h1>
           </summary>
           <div className="details-content">
             <button
@@ -40,11 +48,9 @@ function Discover() {
               onClick={handleAddPlace}
             >
               Save
-              {/* {likedHeart ? '♥' : '♡'}
-              {likedHeart ? 'Save/' : 'Unsave'} */}
             </button>
-            <h4>{place.description}</h4>
-            <h5>{place.activities}</h5>
+            {place.sites.length > 0 ? <h4>Sites:</h4> : ''}
+            {displaySites}
           </div>
         </details>
       </div>
@@ -56,7 +62,7 @@ function Discover() {
 
   function handleAddPlace(event) {
     const placeId = event.target.id;
-    fetch(`/places/${placeId}`)
+    fetch(`/locations/${placeId}`)
       .then((response) => response.json())
       .then((place) => {
         if (!savedPlaces.some((savedPlace) => savedPlace.id === place.id)) {
@@ -77,8 +83,8 @@ function Discover() {
         key={savedPlace.id}
         onClick={handleSavedPlaceClick}
       >
-        <h1>{savedPlace.title}</h1>
-        <h4>{savedPlace.transport_options}</h4>
+        <h1>{savedPlace.name}</h1>
+        <h4>{savedPlace.description}</h4>
         <button
           id={savedPlace.id}
           className="unsave-button"
@@ -115,7 +121,7 @@ function Discover() {
 
     // Update filteredPlaces based on search input
     const searchedPlaces = originalPlaces.filter((place) => {
-      return place.title.toLowerCase().includes(searchValue.toLowerCase());
+      return place.name.toLowerCase().includes(searchValue.toLowerCase());
     });
 
     setFilteredPlaces(searchedPlaces);
@@ -129,7 +135,7 @@ function Discover() {
   return (
     <div>
       <>
-        <NavBar />
+        <NavBar user={user} />
       </>
       <div id="discover-container">
         <div id="content-container">
