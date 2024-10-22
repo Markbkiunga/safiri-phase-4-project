@@ -35,7 +35,7 @@ function Login({ setUser, user }) {
     });
   }
   return (
-    <div id="login-form-container">
+    <div id="login-form-container" className='fade-in'>
       <form onSubmit={handleSubmit} id="login-form">
         <img src={logo} alt="safiri-logo" id="safiri-logo" />
         <h1>Log in Page</h1>

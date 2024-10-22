@@ -32,7 +32,7 @@ function Signup() {
     });
   }
   return (
-    <div id="signup-form-container">
+    <div id="signup-form-container" className='fade-in'>
       <form onSubmit={handleSubmit} id="signup-form">
         <img src={logo} alt="safiri-logo" id="safiri-logo" />
         <h1>Sign up Page</h1>
