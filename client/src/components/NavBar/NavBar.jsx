@@ -31,7 +31,9 @@ const NavBar = ({ setUser, user }) => {
 
   return (
     <nav className="navbar">
-      <img src={logo} alt="Site Logo" className="navbar-logo" />
+      <a href="/">
+        <img src={logo} alt="Site Logo" className="navbar-logo" />
+      </a>
       <ul className="navbar-links">
         <li>
           <Link to="/">Home</Link>
@@ -51,10 +53,12 @@ const NavBar = ({ setUser, user }) => {
 
         <li>
         {/* <button
+          <button
+>>>>>>> c2ae41071562c227d81693ec50c351f163e4a91e
             onClick={() => {
               navigate('/login');
             }}
-            className="navbar-sign-button" 
+            className="navbar-sign-button"
           >
             Login
           </button> */}
@@ -75,6 +79,6 @@ const NavBar = ({ setUser, user }) => {
       )}
     </nav>
   );
-};  
+};
 
 export default NavBar;
