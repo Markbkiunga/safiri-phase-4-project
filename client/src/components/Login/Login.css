@@ -29,20 +29,21 @@
 
 #login-button {
    position: relative; 
-  width: 100%;
+  width: 5%;
   padding: 10px; 
   border: none; 
   border-radius: 5px; 
   color: white; 
   font-size: 16px; 
+  font-weight: bold;
   cursor: pointer;
-  background-color: #28a745;
   transition: background-color 0.3s;
   margin-bottom: 5px;
 }
 
 #login-button:hover {
   background-color: gold; 
+  color: #000;
 }
 
 

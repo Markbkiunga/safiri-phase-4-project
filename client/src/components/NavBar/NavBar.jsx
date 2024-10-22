@@ -50,14 +50,14 @@ const NavBar = ({ setUser, user }) => {
         </li>
 
         <li>
-        <button
+        {/* <button
             onClick={() => {
               navigate('/login');
             }}
             className="navbar-sign-button" 
           >
             Login
-          </button>
+          </button> */}
         </li>
       </ul>
 
@@ -65,6 +65,13 @@ const NavBar = ({ setUser, user }) => {
         <button onClick={handleLogout} id="logout-button">
           Logout User {user.id}
         </button>
+      )}
+      {!user && (
+        <button
+        onClick={() =>{
+          navigate('/login');
+        }}
+        id='login-button'>Login</button>
       )}
     </nav>
   );

@@ -1,15 +1,30 @@
-/* #signup-form {
+ #signup-form {
   margin-top: 100px;
   display: flex;
   flex-direction: column;
   align-items: center;
-}
-.signup-input {
-  margin: 10px;
-  position: relative;
-  width: 20%;
-  border-radius: 5px;
+  padding: 40px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); 
+  border-radius: 18px;
+  width: 350px;
   text-align: center;
+}
+
+#signup-form-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.signup-input {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  position: relative;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 1em;
 }
 #signup-button {
   position: relative;
@@ -23,14 +38,13 @@
 }
 #safiri-logo {
   width: 150px;
-} */
+} 
 
-#signup-form-container {
+/* #signup-form-container {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background: #f0f0f0; 
 }
 
 #signup-form {
@@ -106,7 +120,7 @@
   background-color: rgba(255, 215, 0, 0.8); 
 
 
-}
+}*/
 
 
 .fade-in {
@@ -120,4 +134,4 @@
   to {
     opacity: 1;
   }
-}
+} 
