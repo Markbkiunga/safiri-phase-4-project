@@ -1,0 +1,27 @@
+#login-form {
+  margin-top: 100px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.login-input {
+  margin: 10px;
+  position: relative;
+  width: 20%;
+  border-radius: 5px;
+  text-align: center;
+}
+#login-login-button {
+  position: relative;
+  width: 5%;
+  margin-bottom: 5px;
+}
+#error-message {
+  color: red;
+  z-index: 999;
+  background-color: red;
+}
+#safiri-logo {
+  width: 200px;
+}
+

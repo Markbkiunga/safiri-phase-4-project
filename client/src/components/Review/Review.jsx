@@ -3,175 +3,183 @@ import NavBar from '../NavBar/NavBar';
 import './Review.css';
 import logo from '../pictures/SAFIRI LOGO.png';
 import Footer from '../Footer/Footer';
+import { Formik, Form, Field, ErrorMessage } from 'formik';
+import * as Yup from 'yup';
 
-const Review = () => {
-  const [name, setName] = useState('');
-  const [place, setPlace] = useState('');
-  const [reviewText, setReviewText] = useState('');
-  const [rating, setRating] = useState(null);
-  const [source, setSource] = useState('');
-  const [image, setImage] = useState(''); 
+function Review({ user }) {
   const [reviews, setReviews] = useState([]);
 
+  // 1. Fetch existing reviews from the Flask server on component mount
   useEffect(() => {
     const fetchReviews = async () => {
       try {
-        const response = await fetch(
-          '/reviews'
-        );
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
+        const response = await fetch('/reviews');
+        if (!response.ok) throw new Error('Failed to fetch reviews');
         const data = await response.json();
-        if (Array.isArray(data)) {
-          setReviews(data);
-        } else {
-          console.error('Unexpected data structure:', data);
-          setReviews([]);
-        }
+        setReviews(data);
       } catch (error) {
         console.error('Error fetching reviews:', error);
-        setReviews([]);
       }
     };
-
     fetchReviews();
-  }, []);
+  }, [user]);
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
+  // 2. Define Yup validation schema with required fields and data type validation
+  const validationSchema = Yup.object().shape({
+    userId: Yup.number().required('User ID is required'),
+    siteId: Yup.number().required('Site ID is required'),
+    reviewText: Yup.string().required('Review is required'),
+    rating: Yup.number().required('Rating is required'),
+  });
 
-    const newReview = {
-      id: Date.now(),
-      name,
-      place,
-      review: reviewText,
-      image,
-      rating,
-      source,
-    };
+  // Handle form submission and POST the data to the Flask server
+  const handleSubmit = async (values, { resetForm, setSubmitting }) => {
+    try {
+      // Send the form data as JSON to the server
+      const response = await fetch('/reviews', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(values),
+      });
 
-    console.log(newReview);
+      if (!response.ok) {
+        throw new Error('Failed to submit review');
+      }
 
-    setReviews([...reviews, newReview]);
+      // If submission is successful, update the reviews state
+      const newReview = await response.json();
+      setReviews((prevReviews) => [...prevReviews, newReview]);
 
-    setName('');
-    setPlace('');
-    setReviewText('');
-    setRating(null);
-    setSource('');
-    setImage('');
+      // Reset the form after successful submission
+      resetForm();
+      alert('Review submitted successfully!');
+    } catch (error) {
+      console.error('Error submitting review:', error);
+      alert('There was an error submitting your review.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
-    <div id='review-page'>
-      <NavBar />
-
+    <div id="review-page">
+      <NavBar user={user} />
       <img src={logo} alt="safiri-logo" id="safiri-logo" />
       <h1>Review</h1>
-
       <div className="review-container">
         <div className="form-container">
           <h2>Submit Your Review</h2>
-          <form onSubmit={handleSubmit}>
-            <div className="form-group">
-              <label htmlFor="name">Name:</label>
-              <input
-                type="text"
-                id="name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="place">Place Visited:</label>
-              <input
-                type="text"
-                id="place"
-                value={place}
-                onChange={(e) => setPlace(e.target.value)}
-                required
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="reviewText">Review:</label>
-              <textarea
-                id="reviewText"
-                value={reviewText}
-                onChange={(e) => setReviewText(e.target.value)}
-                required
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="image">Image :</label>
-              <input
-                type="text"
-                id="image"
-                value={image}
-                onChange={(e) => setImage(e.target.value)}
-                placeholder="Enter image URL (optional)"
-              />
-            </div>
-            <div className="form-group">
-              <label>How was your experience using our website?</label>
-              <div className="rating">
-                {Array.from({ length: 10 }, (_, i) => (
-                  <span
-                    key={i + 1}
-                    className={`circle ${rating === i + 1 ? 'selected' : ''}`}
-                    onClick={() => setRating(i + 1)}
-                  >
-                    {i + 1}
-                  </span>
-                ))}
-              </div>
-            </div>
-            <div className="form-group">
-              <label htmlFor="source">How did you hear about us?</label>
-              <select
-                id="source"
-                value={source}
-                onChange={(e) => setSource(e.target.value)}
-                required
-              >
-                <option value="" disabled>
-                  Select an option
-                </option>
-                <option value="friends">From Friends</option>
-                <option value="family">From Family</option>
-                <option value="advertisement">From an Advertisement</option>
-                <option value="social-media">From Social Media</option>
-              </select>
-            </div>
-            <button type="submit" id='submit-review-button'>Submit Review</button>
-          </form>
+
+          {/*Formik to manage the form */}
+          <Formik
+            initialValues={{
+              siteId: '',
+              review: '',
+              rating: '',
+            }}
+            validationSchema={validationSchema}
+            onSubmit={handleSubmit}
+          >
+            {({ values, setFieldValue, isSubmitting }) => (
+              <Form>
+                {/* User-ID Field */}
+                <div className="form-group">
+                  <label htmlFor="userId">User ID:</label>
+                  <Field type="text" id="userId" name="userId" />
+                  <ErrorMessage
+                    name="userId"
+                    component="div"
+                    className="error"
+                  />
+                </div>
+
+                {/* Place Field */}
+                <div className="form-group">
+                  <label htmlFor="siteId">Site ID:</label>
+                  <Field type="text" id="siteId" name="siteId" />
+                  <ErrorMessage
+                    name="siteId"
+                    component="div"
+                    className="error"
+                  />
+                </div>
+
+                {/* Review Text */}
+                <div className="form-group">
+                  <label htmlFor="reviewText">Review:</label>
+                  <Field as="textarea" id="reviewText" name="reviewText" />
+                  <ErrorMessage
+                    name="reviewText"
+                    component="div"
+                    className="error"
+                  />
+                </div>
+
+                {/* Rating Field */}
+                <div className="form-group">
+                  <label>How was your experience?</label>
+                  <div className="rating">
+                    {Array.from({ length: 10 }, (_, i) => (
+                      <span
+                        key={i + 1}
+                        className={`circle ${
+                          values.rating === i + 1 ? 'selected' : ''
+                        }`}
+                        onClick={() => setFieldValue('rating', i + 1)}
+                      >
+                        {i + 1}
+                      </span>
+                    ))}
+                  </div>
+                  <ErrorMessage
+                    name="rating"
+                    component="div"
+                    className="error"
+                  />
+                </div>
+
+                {/* Submit Button */}
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  id="submit-review-button"
+                >
+                  {isSubmitting ? 'Submitting...' : 'Submit Review'}
+                </button>
+              </Form>
+            )}
+          </Formik>
         </div>
+
+        {/* Existing Reviews Display */}
         <div className="existing-reviews new-reviews">
           <h2>Reviews from Other Tourists</h2>
           {reviews.length > 0 ? (
             <ul>
               {reviews.map((review) => (
                 <li key={review.id} className="review-item">
-                  {review.image && (
-                    <img
-                      src={review.image}
-                      alt={`${review.name}'s review`}
-                      className="review-picture"
-                    />
+                  {review.user && (
+                    <div className="review-user">
+                      <img
+                        src={
+                          review.user.profile ? review.user.profile.image : ''
+                        }
+                        alt={`${review.user.username}'s review`}
+                      />
+                      <h3>Username: {review.user.username}</h3>
+                      <h5>Created At: {review.created_at}</h5>
+                      {review.updated_at !== review.created_at ? (
+                        <h5>Updated At: {review.updated_at}</h5>
+                      ) : (
+                        <></>
+                      )}
+                    </div>
                   )}
-                  <h3>{review.name}</h3>
-                  {review.place && (
-                    <p>
-                      <strong>Place Visited:</strong> {review.place}
-                    </p>
-                  )}
-                  {review.review && (
-                    <p>
-                      <strong>Review:</strong> {review.review}
-                    </p>
-                  )}
-                  {/* Removed rating and source */}
+                  <p>
+                    <strong>Site: </strong> {review.site.name}
+                  </p>
+                  <p>{review.description}</p>
+                  <p>{'☆'.repeat(review.rating)}</p>
                 </li>
               ))}
             </ul>
@@ -180,11 +188,10 @@ const Review = () => {
           )}
         </div>
       </div>
-      <div id='review-page-footer'>
+
       <Footer />
-      </div>
     </div>
   );
-};
+}
 
 export default Review;
