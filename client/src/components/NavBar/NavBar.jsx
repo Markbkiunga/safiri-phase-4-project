@@ -28,7 +28,9 @@ const NavBar = ({ setUser, user }) => {
   }
   return (
     <nav className="navbar">
+      <a href="/">
       <img src={logo} alt="Site Logo" className="navbar-logo" />
+      </a>
       <ul className="navbar-links">
         <li>
           <Link to="/">Home</Link>
