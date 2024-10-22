@@ -41,7 +41,7 @@ if __name__ == "__main__":
 
         # SEED LOCATIONS
         locations = []
-        for _ in range(20):
+        for _ in range(5):
             location = Location(
                 name=fake.city(),
                 image="https://picsum.photos/500/300",
@@ -55,7 +55,7 @@ if __name__ == "__main__":
         # SEED USERS AND PROFILES
         users = []
         profiles = []
-        for _ in range(30):
+        for _ in range(5):
             user = User(
                 username=fake.user_name(),
             )
@@ -83,7 +83,7 @@ if __name__ == "__main__":
 
         # SEED SITES
         sites = []
-        for _ in range(20):
+        for _ in range(5):
             site = Site(
                 name=fake.company(),
                 image="https://picsum.photos/100/100",
@@ -99,7 +99,7 @@ if __name__ == "__main__":
 
         # SEED ACTIVITIES
         activities = []
-        for _ in range(10):
+        for _ in range(5):
             activity = Activity(
                 description=fake.sentence(),
                 name=rc(["Hiking", "Kayaking", "Museum Tour", "Beach Day", "Safari"]),
@@ -111,7 +111,7 @@ if __name__ == "__main__":
         db.session.commit()
 
         # SEED USER ACTIVITIES
-        for _ in range(10):
+        for _ in range(5):
             user_activity = UserActivity(
                 feedback=fake.text(),
                 participation_date=fake.date_time_this_year(),
@@ -123,14 +123,14 @@ if __name__ == "__main__":
         db.session.commit()
 
         # SEED SITE ACTIVITIES
-        for _ in range(10):
+        for _ in range(5):
             site_activity = SiteActivity(activity=rc(activities), site=rc(sites))
             db.session.add(site_activity)
 
         db.session.commit()
 
         # SEED REVIEWS
-        for _ in range(20):
+        for _ in range(5):
             review = Review(
                 description=fake.text(),
                 rating=randint(1, 10),
