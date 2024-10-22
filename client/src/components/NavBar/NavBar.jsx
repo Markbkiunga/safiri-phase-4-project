@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import './NavBar.css';
 import logo from '../pictures/logo.png';
 
+
 const NavBar = ({ setUser, user }) => {
   const navigate = useNavigate();
   useEffect(() => {
@@ -61,7 +62,7 @@ const NavBar = ({ setUser, user }) => {
           }}
           id="login-button"
         >
-          Login
+          <p>Login</p>
         </button>
       )}
     </nav>
