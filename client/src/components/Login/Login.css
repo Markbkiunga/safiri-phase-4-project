@@ -28,17 +28,18 @@
 
 
 #login-button {
-   position: relative; 
-  width: 5%;
+  position: relative; 
+  width: 10%;
   padding: 10px; 
   border: none; 
   border-radius: 5px; 
   color: white; 
-  font-size: 16px; 
-  font-weight: bold;
+  font-size: 1.1em; 
+  font-weight: 600;
+  box-sizing: border-box;
   cursor: pointer;
   transition: background-color 0.3s;
-  margin-bottom: 5px;
+  margin-bottom: 10px;
 }
 
 #login-button:hover {
@@ -52,8 +53,9 @@
   padding: 10px; 
   border: none; 
   border-radius: 5px; 
-  background-color: #28a745; 
-  color: white; 
+  background-color: darkgrey; 
+  color: black;
+  font-weight: bold; 
   font-size: 16px; 
   cursor: pointer; 
   transition: background-color 0.3s; 
