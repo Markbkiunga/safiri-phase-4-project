@@ -51,7 +51,7 @@ function Login({ setUser, user }) {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           className="login-input"
-          placeholder="Enter password"
+          placeholder="password"
         />
         <button type="submit" id="login-button">
           Log in
@@ -69,7 +69,7 @@ function Login({ setUser, user }) {
             navigate('/');
           }}
         >
-          X
+          ❌
         </button>
         {error && <p style={{ color: 'red', fontSize: 'small' }}>{error}</p>}
       </form>

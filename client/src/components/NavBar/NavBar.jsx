@@ -45,6 +45,10 @@ const NavBar = ({ setUser, user }) => {
         <li>
           <Link to="/ContactUs">ContactUs</Link>
         </li>
+        <li>
+          <Link to="/ContactUs">Sign</Link>
+        </li>
+
       </ul>
 
       {user && (
