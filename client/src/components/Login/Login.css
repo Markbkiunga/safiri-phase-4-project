@@ -99,7 +99,8 @@
   color: black; 
   font-weight: 600; 
   transition: background-color 0.3s, transform 0.3s; 
-  margin-top: 20px;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
 button:hover {
