@@ -12,7 +12,7 @@ function Login({ setUser, user }) {
 
   function handleSubmit(e) {
     e.preventDefault();
-    fetch('/login', {
+    fetch(' http://127.0.0.1:5555/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -53,7 +53,7 @@ function Login({ setUser, user }) {
           className="login-input"
           placeholder="Enter password"
         />
-        <button type="submit" id="login-login-button">
+        <button type="submit" id="login-login-button" className='login-button-login'>
           Log in
         </button>
         <button
