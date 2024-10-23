@@ -55,7 +55,7 @@
   padding: 10px; 
   border: none; 
   border-radius: 5px; 
-  background-color: darkgrey; 
+  background-color: #4a4a4a; 
   color: black;
   font-weight: bold; 
   font-size: 16px; 
@@ -88,18 +88,27 @@
   align-items: center;
   height: 100vh; 
 }
-
 button {
-  font-size: 1em;
-  background-color: darkgrey;
-  border-radius: 10px;
-  height: 100%;
-  width: 100%;
-  border: none;
+  font-size: 1em; 
+  background-color: #4a4a4a; 
+  border-radius: 8px; 
+  padding: 12px;
+  width: 100%; 
+  border: none; 
   cursor: pointer;
-  color: black;
-  font-weight: bold;
+  color: black; 
+  font-weight: 600; 
+  transition: background-color 0.3s, transform 0.3s; 
   margin-top: 20px;
+}
 
+button:hover {
+  background-color: gold; 
+  color: black;
+  transform: scale(1.05); 
+}
+
+button:active {
+  transform: scale(0.98); 
 }
 
