@@ -14,7 +14,7 @@ function App() {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    fetch('/check_session').then((response) => {
+    fetch('https://safiri-phase-4-project.onrender.com/check_session').then((response) => {
       if (response.ok) {
         response.json().then((user) => setUser(user));
       }
