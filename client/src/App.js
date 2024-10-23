@@ -15,13 +15,13 @@ function App() {
 
   useEffect(() => {
     fetch('https://safiri-phase-4-project.onrender.com/check_session'
-    //   , {
-    //   method: 'GET',
-    //   credentials: 'include', // Ensure cookies are sent with the request
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //   },
-    // }
+      , {
+      method: 'GET',
+      credentials: 'include', // Ensure cookies are sent with the request
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }
   ).then((response) => {
       if (response.ok) {
         response.json().then((user) => setUser(user));
