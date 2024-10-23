@@ -13,7 +13,7 @@ function Review({ user }) {
   useEffect(() => {
     const fetchReviews = async () => {
       try {
-        const response = await fetch('/reviews');
+        const response = await fetch('https://safiri-phase-4-project.onrender.com/reviews');
         if (!response.ok) throw new Error('Failed to fetch reviews');
         const data = await response.json();
         setReviews(data);
@@ -36,7 +36,7 @@ function Review({ user }) {
   const handleSubmit = async (values, { resetForm, setSubmitting }) => {
     try {
       // Send the form data as JSON to the server
-      const response = await fetch('/reviews', {
+      const response = await fetch('https://safiri-phase-4-project.onrender.com/reviews', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(values),

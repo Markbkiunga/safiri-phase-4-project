@@ -12,7 +12,7 @@ function Login({ setUser, user }) {
 
   function handleSubmit(e) {
     e.preventDefault();
-    fetch('/login', {
+    fetch('https://safiri-phase-4-project.onrender.com/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
