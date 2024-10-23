@@ -272,6 +272,19 @@ class ProfileDetail(Resource):
             db.session.rollback()
             return make_response(jsonify({"error": str(e)}), 500)
 
+def serialize_activity(activity):
+    return {
+        "id": activity.id,
+        "name": activity.name,
+        "description": activity.description,
+        "site_id": activity.site_id,
+        "start_time": activity.start_time.isoformat() if activity.start_time else None,
+        "end_time": activity.end_time.isoformat() if activity.end_time else None,
+        "created_at": activity.created_at.isoformat() if activity.created_at else None,
+        "updated_at": activity.updated_at.isoformat() if activity.updated_at else None,
+        "site": serialize_site(activity.site) if activity.site else None,  # Nested site serialization
+        "participants": [serialize_user_activity(ua) for ua in activity.participants] if activity.participants else [],  # Nested user activities
+    }
 
 # Activity Resource
 class ActivityList(Resource):
