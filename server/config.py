@@ -18,7 +18,7 @@ from sqlalchemy import MetaData
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY")
 # app.secret_key = os.environ.get('secret_key)
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get('DATABASE_URI')
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URI")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.json.compact = False
 
@@ -36,4 +36,6 @@ db.init_app(app)
 api = Api(app)
 
 # Instantiate CORS
-CORS(app)
+CORS(
+    app, origins=["http://localhost:3000", "https://safiri-phase-4-project.vercel.app"]
+)
