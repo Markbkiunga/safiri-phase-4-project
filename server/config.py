@@ -16,7 +16,12 @@ from sqlalchemy import MetaData
 
 # Instantiate app, set attributes
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "*"}})
+CORS(
+    app,
+    supports_credentials=True,
+    resources={r"/*": {"origins": "https://safiri-phase-4-project.vercel.app"}},
+)
+
 app.secret_key = os.environ.get("SECRET_KEY")
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URI")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
