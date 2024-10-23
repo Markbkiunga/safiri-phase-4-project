@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import './Login.css';
 import { useNavigate } from 'react-router-dom';
-import logo from '../pictures/SAFIRI LOGO.png';
+import logo from '../pictures/logo.png';
 
 function Login({ setUser, user }) {
   const [username, setUsername] = useState('');
