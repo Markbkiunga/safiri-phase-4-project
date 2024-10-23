@@ -201,13 +201,9 @@ class Activity(db.Model, SerializerMixin):
         "site_activities", "site", creator=lambda site_obj: SiteActivity(site=site_obj)
     )
 
-
 class SiteActivity(db.Model):
     __tablename__ = "site_activities"
-    serialize_rules = (
-        "-site.site_activities",
-        "-activity.site_activities",
-    )
+    serialize_rules = ("-site.site_activities", "-activity.site_activities")
 
     id = db.Column(db.Integer, primary_key=True)
     created_at = db.Column(
@@ -220,12 +216,23 @@ class SiteActivity(db.Model):
         onupdate=datetime.now(gmt_plus_3),
         default=datetime.now(gmt_plus_3),
     )
-
     activity_id = db.Column(db.Integer, db.ForeignKey("activities.id"), nullable=False)
     site_id = db.Column(db.Integer, db.ForeignKey("sites.id"), nullable=False)
 
     activity = db.relationship("Activity", back_populates="site_activities")
     site = db.relationship("Site", back_populates="site_activities")
+
+    def to_dict(self):
+        return {
+        "id": self.id,
+        "activity_id": self.activity_id,
+        "site_id": self.site_id,
+        "created_at": self.created_at.isoformat() if self.created_at else None,
+        "updated_at": self.updated_at.isoformat() if self.updated_at else None,
+        "activity": self.activity.to_dict() if self.activity else None,
+        "site": self.site.to_dict() if self.site else None
+    }
+
 
 
 class Site(db.Model, SerializerMixin):

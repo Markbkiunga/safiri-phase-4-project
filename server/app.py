@@ -346,6 +346,18 @@ class ActivityDetail(Resource):
             db.session.rollback()
             return jsonify({"error": str(e)}), 500
 
+def serialize_user_activity(user_activity):
+    return {
+        "id": user_activity.id,
+        "user_id": user_activity.user_id,
+        "activity_id": user_activity.activity_id,
+        "feedback": user_activity.feedback,
+        "participation_date": user_activity.participation_date.isoformat() if user_activity.participation_date else None,
+        "created_at": user_activity.created_at.isoformat() if user_activity.created_at else None,
+        "updated_at": user_activity.updated_at.isoformat() if user_activity.updated_at else None,
+        "user": user_activity.user.to_dict() if user_activity.user else None,
+        "activity": user_activity.activity.to_dict() if user_activity.activity else None,
+    }
 
 # UserActivity Resource
 class UserActivityList(Resource):
@@ -422,6 +434,17 @@ class UserActivityDetail(Resource):
             db.session.rollback()
             return jsonify({"error": str(e)}), 500
 
+def serialize_site(site):
+    return {
+        "id": site.id,
+        "name": site.name,
+        "description": site.description,
+        "category": site.category,
+        "location_id": site.location_id,
+        "created_at": site.created_at.isoformat() if site.created_at else None,
+        "updated_at": site.updated_at.isoformat() if site.updated_at else None,
+        "location": site.location.to_dict() if site.location else None,
+    }
 
 # Site Resource
 class SiteList(Resource):
@@ -507,6 +530,12 @@ def serialize_site_activity(site_activity):
         "updated_at": (
             site_activity.updated_at.isoformat() if site_activity.updated_at else None
         ),
+        "site": serialize_site(site_activity.site),
+        "activity": serialize_activity(site_activity.activity),
+        "user_activities": [
+            serialize_user_activity(user_activity)
+            for user_activity in site_activity.user_activities
+        ],
     }
 
 
