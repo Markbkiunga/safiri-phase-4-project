@@ -16,6 +16,7 @@ from sqlalchemy import MetaData
 
 # Instantiate app, set attributes
 app = Flask(__name__)
+CORS(app)
 app.secret_key = os.environ.get("SECRET_KEY")
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URI")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -33,6 +34,3 @@ db.init_app(app)
 
 # Instantiate REST API
 api = Api(app)
-
-# Instantiate CORS
-CORS(app)
