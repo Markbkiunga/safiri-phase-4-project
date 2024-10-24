@@ -21,7 +21,7 @@ CORS(
     origins=["https://safiri-phase-4-project.vercel.app"],
     supports_credentials=True,
 )
-app.secret_key = os.environ.get("SECRET_KEY")
+app.secret_key = os.getenv("SECRET_KEY")
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY")
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URI")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
