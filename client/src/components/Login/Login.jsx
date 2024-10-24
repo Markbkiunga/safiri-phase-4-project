@@ -10,29 +10,40 @@ function Login({ setUser, user }) {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
-    fetch('https://safiri-phase-4-project.onrender.com/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        username: username,
-        password: password,
-      }),
-    }).then((r) => {
-      if (r.ok) {
-        r.json().then((user) => {
-          setUser(user);
-          setTimeout(() => {
-            window.location.href = '/';
-          }, 1000);
-        });
+    try {
+      const response = await fetch(
+        'https://safiri-phase-4-project.onrender.com/login',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            username: username,
+            password: password,
+          }),
+        }
+      );
+
+      if (response.status === 200) {
+        const data = await response.json();
+        console.log('Login successful', data);
+
+        localStorage.setItem('access_token', data.tokens.access);
+        localStorage.setItem('refresh_token', data.tokens.refresh);
+
+        window.location.href = '/';
       } else {
-        r.json().then((err) => setError(err.error));
+        const errorData = await response.json();
+        setError(errorData);
+        console.error('Login failed', errorData);
       }
-    });
+    } catch (error) {
+      setError(error);
+      console.error('Network error:', error);
+    }
   }
   return (
     <div id="login-form-container">
