@@ -25,12 +25,8 @@ app.secret_key = os.getenv("SECRET_KEY")
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY")
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URI")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.config.update(
-    SESSION_COOKIE_SECURE=True,  # Ensure it's set to True for HTTPS
-    SESSION_COOKIE_SAMESITE="Lax",  # Controls whether the session cookie is sent for cross-origin requests
-    SESSION_COOKIE_HTTPONLY=True,  # Prevents client-side access to session cookies
-)
-
+app.config['SESSION_COOKIE_SAMESITE'] = 'None'
+app.config['SESSION_COOKIE_SECURE'] = True
 app.json.compact = False
 
 # Define metadata, instantiate db
