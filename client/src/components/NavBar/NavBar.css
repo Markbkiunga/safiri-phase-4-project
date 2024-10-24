@@ -68,66 +68,64 @@ nav button:hover {
 }
 
 #login-button {
-  color: #fff; 
+  color: #fff;
   padding: 5px 15px;
-  background-color: rgba(255, 255, 255, 0.1); 
-  border-radius: 5px; 
-  transition: background-color 0.3s ease, color 0.3s ease; 
-  border: none; 
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 5px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  border: none;
   cursor: pointer;
-  display: flex; 
-  align-items: center; 
-  justify-content: center; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 #login-button:hover {
-  background-color: rgba(255, 215, 0, 0.8); 
+  background-color: rgba(255, 215, 0, 0.8);
   color: #000;
 }
 
 #login-button p {
-  margin: 0; 
-  padding: 0; 
-  font-size: 16px; 
-  color: inherit; 
+  margin: 0;
+  padding: 0;
+  font-size: 16px;
+  color: inherit;
 }
-
 
 @media (max-width: 1000px) {
   .navbar {
-    justify-content: center; 
+    justify-content: center;
     padding: 10px;
   }
 
   .navbar-links {
-    gap: 10px; 
+    gap: 10px;
   }
 
   nav button {
-    margin-left: 5px; 
+    margin-left: 5px;
     padding: 5px 10px;
     font-size: 14px;
   }
 
   .navbar-logo {
-    height: 10 rem; 
+    height: 10 rem;
     padding-left: 40%;
   }
 
   #login-button {
-    padding: 5px 10px; 
-    font-size: 14px; 
+    padding: 5px 10px;
+    font-size: 14px;
   }
-  
+
   #login-button p {
     font-size: 14px;
   }
 }
 
-
 @media (max-width: 480px) {
   .navbar {
-    flex-wrap: wrap; 
+    flex-wrap: wrap;
     justify-content: center;
   }
 
@@ -145,11 +143,11 @@ nav button:hover {
     margin-bottom: 10px;
   }
 
-  #login-button { 
+  #login-button {
     margin-top: 20px;
   }
 
   #login-button p {
-    font-size: 16px; 
+    font-size: 16px;
   }
 }
