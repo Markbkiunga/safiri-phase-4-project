@@ -1,5 +1,4 @@
   .home{
-    margin-top: 10px;
     position: relative;
     background-image: url(https://images.unsplash.com/photo-1729546493750-314d158125fa?w=400&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHw1Nnx8fGVufDB8fHx8fA%3D%3D);
     background-position: center; 
@@ -24,7 +23,6 @@
 
   .home-header {
     position: relative; 
-    padding: 20px;
     color: rgb(247, 241, 241);
     text-align: center;
     z-index: 2; 

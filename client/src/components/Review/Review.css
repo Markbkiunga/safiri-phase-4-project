@@ -2,24 +2,25 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin-top: 50px;
 }
 .review-container {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  max-width: 1200px;
+  max-width: 1000px;
   padding: 20px;
   border: 1px solid gold;
   border-radius: 5px;
-  background-color: gold;
+  background-color: #f2d012;
   box-sizing: border-box; /* Include padding and border in the element's total width and height */
 }
 
 .form-container,
 .existing-reviews,
 .new-reviews {
-  width: 48%;
+  width: 75%;
 }
 
 .form-container {

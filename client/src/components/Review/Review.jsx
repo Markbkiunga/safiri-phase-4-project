@@ -6,7 +6,7 @@ import Footer from '../Footer/Footer';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 
-function Review({ user }) {
+function Review({ user , myFunction}) {
   const [reviews, setReviews] = useState([]);
 
   // 1. Fetch existing reviews from the Flask server on component mount
@@ -62,7 +62,7 @@ function Review({ user }) {
   };
 
   return (
-    <div id="review-page">
+    <div id="review-page" onLoad={myFunction}>
       <NavBar user={user} />
       <img src={logo} alt="safiri-logo" id="safiri-logo" />
       <h1>Review</h1>

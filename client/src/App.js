@@ -10,7 +10,7 @@ import Signup from './components/Signup/Signup';
 import Login from './components/Login/Login';
 import { useState, useEffect } from 'react';
 
-function App() {
+function App({myFunction}) {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
@@ -25,9 +25,9 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Home setUser={setUser} user={user} />} />
-        <Route path="/discover" element={<Discover user={user} />} />
+        <Route path="/discover" element={<Discover user={user} myFunction={myFunction}/>} />
         <Route path="/about" element={<AboutUs user={user} />} />
-        <Route path="/review" element={<Review user={user} />} />
+        <Route path="/review" element={<Review user={user} myFunction={myFunction}/>} />
         <Route path="/ContactUs" element={<ContactUs user={user} />} />
         <Route path="/signup" element={<Signup user={user} />} />
         <Route
