@@ -16,15 +16,19 @@ from flask_cors import CORS
 
 # Instantiate app, set attributes
 app = Flask(__name__)
-CORS(app)
+CORS(
+    app,
+    origins=["https://safiri-phase-4-project.vercel.app"],
+    supports_credentials=True,
+)
 app.secret_key = os.environ.get("SECRET_KEY")
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY")
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URI")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config.update(
     SESSION_COOKIE_SECURE=True,  # Ensure it's set to True for HTTPS
-    SESSION_COOKIE_SAMESITE='Lax',  # Controls whether the session cookie is sent for cross-origin requests
-    SESSION_COOKIE_HTTPONLY=True   # Prevents client-side access to session cookies
+    SESSION_COOKIE_SAMESITE="Lax",  # Controls whether the session cookie is sent for cross-origin requests
+    SESSION_COOKIE_HTTPONLY=True,  # Prevents client-side access to session cookies
 )
 
 app.json.compact = False
