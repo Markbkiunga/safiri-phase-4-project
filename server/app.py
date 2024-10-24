@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 # Standard library imports
+from flask_cors import CORS
 
 # Remote library imports
 
@@ -22,6 +23,7 @@ from models import (
     Activity,
 )
 
+CORS(app)
 
 from datetime import datetime
 import pytz
@@ -52,9 +54,12 @@ class Login(Resource):
 
 class CheckSession(Resource):
     def get(self):
-        if session["user_id"]:
+        if session.get("user_id"):
             user = User.query.filter_by(id=session["user_id"]).first()
-            return user.to_dict(), 200
+            if user:
+                return user.to_dict(), 200
+            else:
+                return {"error": "User not found"}, 404
         else:
             return {"error": "You are not logged in"}, 401
 
