@@ -22,11 +22,13 @@ CORS(
     supports_credentials=True,
 )
 app.secret_key = os.getenv("SECRET_KEY")
-app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY")
+app.config["SECRET_KEY"] = os.environ.get(
+    "SECRET_KEY", "b'\xeftXH\x10\xbf\xeb\xa7\xb5+\xc8S\xa4_\xe1\x0f'"
+)
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URI")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.config['SESSION_COOKIE_SAMESITE'] = 'None'
-app.config['SESSION_COOKIE_SECURE'] = True
+app.config["SESSION_COOKIE_SAMESITE"] = "None"
+app.config["SESSION_COOKIE_SECURE"] = True
 app.json.compact = False
 
 # Define metadata, instantiate db
