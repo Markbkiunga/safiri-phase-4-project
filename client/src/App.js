@@ -14,19 +14,13 @@ function App() {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    fetch('http://127.0.0.1:8000/check_session'
-      , {
-      method: 'GET',
-      credentials: 'include', // Ensure cookies are sent with the request
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }
-  ).then((response) => {
-      if (response.ok) {
-        response.json().then((user) => setUser(user));
+    fetch('https://safiri-phase-4-project.onrender.com/check_session').then(
+      (response) => {
+        if (response.ok) {
+          response.json().then((user) => setUser(user));
+        }
       }
-    });
+    );
   }, []);
 
   return (
