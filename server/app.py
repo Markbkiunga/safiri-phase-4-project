@@ -4,8 +4,17 @@
 
 # Remote library imports
 
-from flask import request, session, make_response, jsonify
+from flask import request, make_response, jsonify
 from flask_restful import Resource, reqparse
+from flask_jwt_extended import (
+    create_access_token,
+    create_refresh_token,
+    jwt_required,
+    get_jwt_identity,
+    jwt_refresh_token_required,
+    get_jwt,
+)
+from blacklist import BLACKLIST
 
 # Local imports
 from config import app, db, api
@@ -44,35 +53,45 @@ class Login(Resource):
             return {"error": "Missing required fields"}, 422
         user = User.query.filter_by(username=data["username"]).first()
         if user and user.check_password(data["password"]):
-            session["user_id"] = user.id
-            return user.to_dict(), 200
-        else:
-            return {"error": "Invalid username or password"}, 401
+            access_token = create_access_token(identity=user.id)
+            refresh_token = create_refresh_token(identity=user.id)
+
+            return make_response(
+                {
+                    "message": "Login successful",
+                    "tokens": {"access": access_token, "refresh": refresh_token},
+                },
+                200,
+            )
+
+        return make_response({"error": "Invalid username or password"})
 
 
+@jwt_required()
 class CheckSession(Resource):
     def get(self):
-        if session.get("user_id"):
-            user = User.query.filter_by(id=session["user_id"]).first()
-            if user:
-                return user.to_dict(), 200
-            else:
-                return (
-                    {"error": "User not found"},
-                    404,
-                )
-
+        current_user_id = get_jwt_identity()
+        user = User.query.filter_by(id=current_user_id).first()
+        if user:
+            return user.to_dict(), 200
         else:
-            return {"error": "You are not logged in"}, 401
+            return {"error": "User not found"}, 404
 
 
 class Logout(Resource):
+    @jwt_required
     def delete(self):
-        if session["user_id"]:
-            session["user_id"] = None
-            return {}, 204
-        else:
-            return {"error": "You are not logged in"}, 401
+        jti = get_jwt()["jti"]
+        BLACKLIST.add(jti)
+        return {"message": "Successfully logged out"}, 200
+
+
+class RefreshToken(Resource):
+    @jwt_refresh_token_required
+    def post(self):
+        current_user_id = get_jwt_identity()
+        new_access_token = create_access_token(identity=current_user_id)
+        return {"access_token": new_access_token}, 200
 
 
 class Signup(Resource):
@@ -87,10 +106,22 @@ class Signup(Resource):
             user.set_password(data["password"])
             db.session.add(user)
             db.session.commit()
-            session["user_id"] = user.id
-            return user.to_dict(), 201
+            access_token = create_access_token(identity=user.id)
+            refresh_token = create_refresh_token(identity=user.id)
+
+            return make_response(
+                {
+                    "message": "Signup successful",
+                    "tokens": {
+                        "access": access_token,
+                        "refresh": refresh_token,
+                    },
+                },
+                201,
+            )
+
         except Exception as e:
-            print(e)
+            db.session.rollback()
             return {"error": f"{str(e)}"}, 500
 
 
@@ -146,38 +177,32 @@ class UserDetail(Resource):
 # Class to get and create reviews
 class ReviewList(Resource):
     def get(self):
-        # Get all reviews
         reviews = Review.query.all()
         return jsonify([review.to_dict() for review in reviews])
 
+    @jwt_required()
     def post(self):
-        if not session["user_id"]:
-            print("User not logged in")
-            return make_response({"error": "User not logged in"}, 401)
+        current_user_id = get_jwt_identity()
 
-        # Parse input data
         parser = reqparse.RequestParser()
         parser.add_argument("reviewText", required=True, help="Description is required")
         parser.add_argument(
             "rating", type=int, required=True, help="Rating is required"
         )
-        parser.add_argument("userId", type=int, required=True)
         parser.add_argument("siteId", type=int, required=True)
         data = parser.parse_args()
 
-        # Check if user and site exist
-        user = User.query.get(data["userId"])
         site = Site.query.get(data["siteId"])
 
-        if not user or not site:
-            return jsonify({"error": "User or Site not found"}), 404
+        if not site:
+            return jsonify({"error": "Site not found"}), 404
 
         # Create a new review
         try:
             new_review = Review(
                 description=data["reviewText"],
                 rating=data["rating"],
-                user_id=user.id,
+                user_id=current_user_id,
                 site_id=site.id,
                 created_at=datetime.now(gmt_plus_3),
             )
@@ -640,7 +665,7 @@ api.add_resource(SiteActivityList, "/site_activities", endpoint="site_activities
 api.add_resource(SiteActivityDetail, "/site_activities/<int:id>")
 api.add_resource(LocationList, "/locations")
 api.add_resource(LocationDetail, "/locations/<int:id>")
-
+api.add_resource(RefreshToken, "/refresh")
 
 if __name__ == "__main__":
     app.run(port=5555, debug=True)
