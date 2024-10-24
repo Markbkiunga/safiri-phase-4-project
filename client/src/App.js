@@ -14,17 +14,15 @@ function App() {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    fetch('https://safiri-phase-4-project.onrender.com/check_session', {
-      method: 'GET',
-      credentials: 'include', // Include cookies in the request
-    }).then((response) => {
-      if (response.ok) {
-        response.json().then((user) => setUser(user));
+    fetch('https://safiri-phase-4-project.onrender.com/check_session').then(
+      (response) => {
+        if (response.ok) {
+          response.json().then((user) => setUser(user));
+        }
       }
-    });
+    );
   }, []);
 
-  
   return (
     <Router>
       <Routes>

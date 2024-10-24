@@ -4,8 +4,8 @@
 
 # Remote library imports
 
-from flask import request, session, Blueprint, make_response, jsonify
-from flask_restful import Resource, Api, reqparse
+from flask import request, session, make_response, jsonify
+from flask_restful import Resource, reqparse
 
 # Local imports
 from config import app, db, api
@@ -45,7 +45,6 @@ class Login(Resource):
         user = User.query.filter_by(username=data["username"]).first()
         if user and user.check_password(data["password"]):
             session["user_id"] = user.id
-            print(f"Session set with user_id: {session['user_id']}")
             return user.to_dict(), 200
         else:
             return {"error": "Invalid username or password"}, 401
@@ -54,7 +53,6 @@ class Login(Resource):
 class CheckSession(Resource):
     def get(self):
         if session.get("user_id"):
-            print(f"Session data: {session}")
             user = User.query.filter_by(id=session["user_id"]).first()
             if user:
                 return user.to_dict(), 200
