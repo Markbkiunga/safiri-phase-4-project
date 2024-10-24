@@ -11,7 +11,6 @@ from flask_jwt_extended import (
     create_refresh_token,
     jwt_required,
     get_jwt_identity,
-    jwt_refresh_token_required,
     get_jwt,
 )
 from blacklist import BLACKLIST
@@ -87,11 +86,11 @@ class Logout(Resource):
 
 
 class RefreshToken(Resource):
-    @jwt_refresh_token_required
-    def post(self):
-        current_user_id = get_jwt_identity()
-        new_access_token = create_access_token(identity=current_user_id)
-        return {"access_token": new_access_token}, 200
+    @jwt_required(refresh=True)
+    def get(self):
+        identity = get_jwt_identity()
+        new_access_token = create_access_token(identity=identity)
+        return make_response({'access_token' : new_access_token})
 
 
 class Signup(Resource):
