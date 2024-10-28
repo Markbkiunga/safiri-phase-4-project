@@ -2,7 +2,7 @@ import React from 'react';
 import './ContactUs.css';
 import NavBar from '../NavBar/NavBar';
 import logo from '../pictures/SAFIRI LOGO.png';
-import Footer from '../Footer/Footer';
+// import Footer from '../Footer/Footer';
 
 const ContactUs = ({ user }) => {
   return (
@@ -52,7 +52,7 @@ const ContactUs = ({ user }) => {
         </div>
       </div>
       <div id="contactus-footer">
-        <Footer />
+        {/* <Footer /> */}
       </div>
     </div>
   );
