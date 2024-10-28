@@ -54,6 +54,7 @@ class Login(Resource):
         if user and user.check_password(data["password"]):
             access_token = create_access_token(identity=user.id)
             refresh_token = create_refresh_token(identity=user.id)
+            print("Generated tokens:", access_token, refresh_token)
 
             return make_response(
                 {
