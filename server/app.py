@@ -105,14 +105,9 @@ class UserDetail(Resource):
         if not user:
             return make_response(jsonify({"error": "User not found"}), 404)
 
-        # Parse input data to update user profile
-        parser = reqparse.RequestParser()
-        parser.add_argument("first_name", type=str)
-        parser.add_argument("last_name", type=str)
-        parser.add_argument("email", type=str)
-        parser.add_argument("bio", type=str)
-        parser.add_argument("phone_number", type=str)
-        data = parser.parse_args()
+        data = request.get_json()
+        if not data:
+            return make_response(jsonify({"error": "No data provided"}), 400)
 
         # Update the profile with the new data
         profile = user.profile
@@ -134,8 +129,6 @@ class UserDetail(Resource):
         db.session.delete(user)
         db.session.commit()
         return make_response(jsonify({"message": "User deleted successfully"}), 200)
-
-
 # Class to get and create reviews
 class ReviewList(Resource):
     def get(self):
@@ -148,15 +141,13 @@ class ReviewList(Resource):
             print("User not logged in")
             return make_response({"error": "User not logged in"}, 401)
 
-        # Parse input data
-        parser = reqparse.RequestParser()
-        parser.add_argument("reviewText", required=True, help="Description is required")
-        parser.add_argument(
-            "rating", type=int, required=True, help="Rating is required"
-        )
-        parser.add_argument("userId", type=int, required=True)
-        parser.add_argument("siteId", type=int, required=True)
-        data = parser.parse_args()
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "No data provided"}), 400
+
+        # Check if required fields are present
+        if not all(key in data for key in ["reviewText", "rating", "userId", "siteId"]):
+            return jsonify({"error": "Missing required fields"}), 400
 
         # Check if user and site exist
         user = User.query.get(data["userId"])
@@ -197,11 +188,9 @@ class ReviewDetail(Resource):
         if not review:
             return jsonify({"error": "Review not found"}), 404
 
-        # Parse input data to update review
-        parser = reqparse.RequestParser()
-        parser.add_argument("description", type=str)
-        parser.add_argument("rating", type=int)
-        data = parser.parse_args()
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "No data provided"}), 400
 
         review.description = data.get("description", review.description)
         review.rating = data.get("rating", review.rating)
@@ -233,13 +222,9 @@ class ProfileDetail(Resource):
         if not profile:
             return make_response(jsonify({"error": "Profile not found"}), 404)
 
-        parser = reqparse.RequestParser()
-        parser.add_argument("first_name", type=str)
-        parser.add_argument("last_name", type=str)
-        parser.add_argument("email", type=str)
-        parser.add_argument("bio", type=str)
-        parser.add_argument("phone_number", type=str)
-        data = parser.parse_args()
+        data = request.get_json()
+        if not data:
+            return make_response(jsonify({"error": "No data provided"}), 400)
 
         profile.first_name = data.get("first_name", profile.first_name)
         profile.last_name = data.get("last_name", profile.last_name)
@@ -277,11 +262,12 @@ class ActivityList(Resource):
         return jsonify([activity.to_dict() for activity in activities])
 
     def post(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument("name", required=True, help="Name is required")
-        parser.add_argument("description", type=str)
-        parser.add_argument("category", type=str)
-        data = parser.parse_args()
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "No data provided"}), 400
+
+        if "name" not in data:
+            return jsonify({"error": "Name is required"}), 400
 
         new_activity = Activity(
             name=data["name"],
@@ -312,11 +298,9 @@ class ActivityDetail(Resource):
         if not activity:
             return jsonify({"error": "Activity not found"}), 404
 
-        parser = reqparse.RequestParser()
-        parser.add_argument("name", type=str)
-        parser.add_argument("description", type=str)
-        parser.add_argument("category", type=str)
-        data = parser.parse_args()
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "No data provided"}), 400
 
         activity.name = data.get("name", activity.name)
         activity.description = data.get("description", activity.description)
@@ -342,8 +326,7 @@ class ActivityDetail(Resource):
         except Exception as e:
             db.session.rollback()
             return jsonify({"error": str(e)}), 500
-
-
+        
 # UserActivity Resource
 class UserActivityList(Resource):
     def get(self):
@@ -351,16 +334,9 @@ class UserActivityList(Resource):
         return jsonify([user_activity.to_dict() for user_activity in user_activities])
 
     def post(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument("user_id", required=True, help="User ID is required")
-        parser.add_argument(
-            "activity_id", required=True, help="Activity ID is required"
-        )
-        parser.add_argument("feedback", type=str)
-        parser.add_argument(
-            "participation_date", type=str, default=str(datetime.now(gmt_plus_3))
-        )
-        data = parser.parse_args()
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "No data provided"}), 400
 
         new_user_activity = UserActivity(
             user_id=data["user_id"],
@@ -392,9 +368,9 @@ class UserActivityDetail(Resource):
         if not user_activity:
             return jsonify({"error": "User Activity not found"}), 404
 
-        parser = reqparse.RequestParser()
-        parser.add_argument("feedback", type=str)
-        data = parser.parse_args()
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "No data provided"}), 400
 
         user_activity.feedback = data.get("feedback", user_activity.feedback)
         user_activity.updated_at = datetime.now(gmt_plus_3)
@@ -427,12 +403,9 @@ class SiteList(Resource):
         return jsonify([site.to_dict() for site in sites])
 
     def post(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument("name", required=True, help="Name is required")
-        parser.add_argument("description", type=str)
-        parser.add_argument("category", type=str)
-        parser.add_argument("location_id", type=int, required=True)
-        data = parser.parse_args()
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "No data provided"}), 400
 
         new_site = Site(
             name=data["name"],
@@ -462,11 +435,9 @@ class SiteDetail(Resource):
         if not site:
             return jsonify({"error": "Site not found"}), 404
 
-        parser = reqparse.RequestParser()
-        parser.add_argument("name", type=str)
-        parser.add_argument("description", type=str)
-        parser.add_argument("category", type=str)
-        data = parser.parse_args()
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "No data provided"}), 400
 
         site.name = data.get("name", site.name)
         site.description = data.get("description", site.description)
@@ -518,12 +489,9 @@ class SiteActivityList(Resource):
         )
 
     def post(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument(
-            "activity_id", required=True, help="Activity ID is required"
-        )
-        parser.add_argument("site_id", required=True, help="Site ID is required")
-        data = parser.parse_args()
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "No data provided"}), 400
 
         new_site_activity = SiteActivity(
             activity_id=data["activity_id"], site_id=data["site_id"]
@@ -550,14 +518,13 @@ class SiteActivityDetail(Resource):
         if not site_activity:
             return jsonify({"error": "SiteActivity not found"}), 404
 
-        parser = reqparse.RequestParser()
-        parser.add_argument("activity_id", type=int)
-        parser.add_argument("site_id", type=int)
-        data = parser.parse_args()
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "No data provided"}), 400
 
-        if data["activity_id"] is not None:
+        if "activity_id" in data:
             site_activity.activity_id = data["activity_id"]
-        if data["site_id"] is not None:
+        if "site_id" in data:
             site_activity.site_id = data["site_id"]
 
         try:
@@ -588,10 +555,9 @@ class LocationList(Resource):
         return jsonify([location.to_dict() for location in locations])
 
     def post(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument("name", required=True, help="Name is required")
-        parser.add_argument("description", type=str)
-        data = parser.parse_args()
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "No data provided"}), 400
 
         new_location = Location(
             name=data["name"], description=data.get("description", "")
