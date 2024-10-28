@@ -59,6 +59,7 @@ class Login(Resource):
                 {
                     "message": "Login successful",
                     "tokens": {"access": access_token, "refresh": refresh_token},
+                    "user": user.to_dict(),
                 },
                 200,
             )
@@ -90,7 +91,7 @@ class RefreshToken(Resource):
     def get(self):
         identity = get_jwt_identity()
         new_access_token = create_access_token(identity=identity)
-        return make_response({'access_token' : new_access_token})
+        return make_response({"access_token": new_access_token})
 
 
 class Signup(Resource):

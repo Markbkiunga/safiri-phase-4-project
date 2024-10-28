@@ -31,17 +31,24 @@ function Login({ setUser, user }) {
         const data = await response.json();
         console.log('Login successful', data);
 
-        localStorage.setItem('access_token', data.tokens.access);
-        localStorage.setItem('refresh_token', data.tokens.refresh);
+        if (data.tokens && data.tokens.access && data.tokens.refresh) {
+          localStorage.setItem('access_token', data.tokens.access);
+          localStorage.setItem('refresh_token', data.tokens.refresh);
 
-        window.location.href = '/';
+          setUser(data.user);
+
+          window.location.href = '/';
+        } else {
+          console.error('Tokens missing from response');
+          setError('Login response is missing tokens. Please try again.');
+        }
       } else {
         const errorData = await response.json();
-        setError(errorData);
+        setError(errorData.error || 'Login failed');
         console.error('Login failed', errorData);
       }
     } catch (error) {
-      setError(error);
+      setError('Network error, please try again.');
       console.error('Network error:', error);
     }
   }
