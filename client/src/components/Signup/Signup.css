@@ -3,18 +3,31 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  width: 500px;
+}
+#signup-form-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 .signup-input {
   margin: 10px;
   position: relative;
-  width: 20%;
+  width: 50%;
   border-radius: 5px;
   text-align: center;
 }
 #signup-button {
   position: relative;
-  width: 5%;
+  width: 20%;
   margin-bottom: 5px;
+  transition: background-color 0.5s;
+}
+#signup-button:hover {
+  background-color: gold;
+  transform: scale(1.05);
+  cursor: pointer;
 }
 #error-message {
   color: red;
@@ -22,5 +35,5 @@
   background-color: red;
 }
 #safiri-logo {
-  width: 150px;
+  width: 200px;
 }
