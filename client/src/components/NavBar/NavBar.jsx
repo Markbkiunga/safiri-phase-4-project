@@ -3,7 +3,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import './NavBar.css';
 import logo from '../pictures/logo.png';
 
-
 const NavBar = ({ setUser, user }) => {
   const navigate = useNavigate();
   useEffect(() => {
@@ -22,15 +21,32 @@ const NavBar = ({ setUser, user }) => {
       lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
     });
   }, []);
+
   function handleLogout() {
     fetch('/logout', {
       method: 'DELETE',
-    }).then(() => setUser(null));
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+      },
+    })
+      .then((response) => {
+        if (response.status === 200) {
+          console.log('Logged out successfully');
+          localStorage.removeItem('access_token');
+          localStorage.removeItem('refresh_token');
+          window.location.href = '/';
+        } else {
+          console.error('Error logging out');
+        }
+      })
+      .catch((error) => {
+        console.error('Network error:', error);
+      });
   }
   return (
     <nav className="navbar">
       <a href="/">
-      <img src={logo} alt="Site Logo" className="navbar-logo" />
+        <img src={logo} alt="Site Logo" className="navbar-logo" />
       </a>
       <ul className="navbar-links">
         <li>

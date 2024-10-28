@@ -11,7 +11,7 @@ function Signup() {
   const navigate = useNavigate();
   function handleSubmit(e) {
     e.preventDefault();
-    fetch('/signup', {
+    fetch('https://safiri-phase-4-project.onrender.com/signup', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

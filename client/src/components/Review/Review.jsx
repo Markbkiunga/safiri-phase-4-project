@@ -13,7 +13,9 @@ function Review({ user , myFunction}) {
   useEffect(() => {
     const fetchReviews = async () => {
       try {
-        const response = await fetch('/reviews');
+        const response = await fetch(
+          'https://safiri-phase-4-project.onrender.com/reviews'
+        );
         if (!response.ok) throw new Error('Failed to fetch reviews');
         const data = await response.json();
         setReviews(data);
@@ -36,11 +38,17 @@ function Review({ user , myFunction}) {
   const handleSubmit = async (values, { resetForm, setSubmitting }) => {
     try {
       // Send the form data as JSON to the server
-      const response = await fetch('/reviews', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(values),
-      });
+      const response = await fetch(
+        'https://safiri-phase-4-project.onrender.com/reviews',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('access_token')}`, // Send JWT access token
+          },
+          body: JSON.stringify(values),
+        }
+      );
 
       if (!response.ok) {
         throw new Error('Failed to submit review');
@@ -82,17 +90,6 @@ function Review({ user , myFunction}) {
           >
             {({ values, setFieldValue, isSubmitting }) => (
               <Form>
-                {/* User-ID Field */}
-                <div className="form-group">
-                  <label htmlFor="userId">User ID:</label>
-                  <Field type="text" id="userId" name="userId" />
-                  <ErrorMessage
-                    name="userId"
-                    component="div"
-                    className="error"
-                  />
-                </div>
-
                 {/* Place Field */}
                 <div className="form-group">
                   <label htmlFor="siteId">Site ID:</label>

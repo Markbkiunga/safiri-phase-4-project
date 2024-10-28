@@ -12,7 +12,7 @@ function Discover({ user, myFunction }) {
 
   // Fetch Places
   useEffect(() => {
-    fetch('/locations')
+    fetch('https://safiri-phase-4-project.onrender.com/locations')
       .then((response) => response.json())
       .then((placesData) => {
         setOriginalPlaces(placesData); // Set original places
@@ -62,7 +62,7 @@ function Discover({ user, myFunction }) {
 
   function handleAddPlace(event) {
     const placeId = event.target.id;
-    fetch(`/locations/${placeId}`)
+    fetch(`https://safiri-phase-4-project.onrender.com/locations/${placeId}`)
       .then((response) => response.json())
       .then((place) => {
         if (!savedPlaces.some((savedPlace) => savedPlace.id === place.id)) {

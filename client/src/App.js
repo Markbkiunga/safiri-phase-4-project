@@ -14,7 +14,12 @@ function App({myFunction}) {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    fetch('/check_session').then((response) => {
+    fetch('https://safiri-phase-4-project.onrender.com/check_session', {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
+    }).then((response) => {
       if (response.ok) {
         response.json().then((user) => setUser(user));
       }
